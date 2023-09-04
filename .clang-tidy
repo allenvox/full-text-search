@@ -1,0 +1,20 @@
+---
+Checks: >
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  *,
+  -altera-*,
+  -fuchsia-*,
+  -llvmlibc-*,
+  -llvm-header-guard,
+  -modernize-use-nodiscard,
+  -modernize-use-trailing-return-type,
+  -cppcoreguidelines-owning-memory,
+  -google-runtime-references,
+  -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -readability-identifier-length,
+  -readability-magic-numbers
+WarningsAsErrors: '*'
+HeaderFilterRegex: 'fts/'
+...
