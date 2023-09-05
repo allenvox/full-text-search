@@ -3,7 +3,7 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
-    cxxopts::Options options("sqrt");
+    cxxopts::Options options("sum");
     try {
         // clang-format off
         options.add_options()
