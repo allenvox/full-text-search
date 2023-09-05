@@ -1,7 +1,7 @@
 set(target_name fts)
 
 add_library(${target_name} STATIC
-  include/fts/fts.hpp
+  ${PROJECT_SOURCE_DIR}/include/fts/fts.hpp
   fts.cpp)
 
 include(CompileOptions)
