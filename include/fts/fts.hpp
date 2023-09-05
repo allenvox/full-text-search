@@ -1,5 +1,5 @@
 #pragma once
 
-namespace sum {
+namespace fts {
 double sum(const double a, const double b);
-} // namespace sum
+} // namespace fts

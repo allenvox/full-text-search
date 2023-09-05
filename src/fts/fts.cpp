@@ -1,5 +1,5 @@
 #include <fts.hpp>
 
-namespace sum {
+namespace fts {
 double sum(const double a, const double b) { return a + b; }
-} // namespace sum
+} // namespace fts
