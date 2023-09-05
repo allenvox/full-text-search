@@ -1,9 +1,9 @@
 include(FetchContent)
 
 FetchContent_Declare(
-  fmtlib
+  fmt
   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
-  GIT_TAG v10.1.1
+  GIT_TAG master
   GIT_SHALLOW TRUE
   PREFIX ${CMAKE_CURRENT_BINARY_DIR}
 )
