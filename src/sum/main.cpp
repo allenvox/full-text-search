@@ -1,5 +1,5 @@
 #include <cxxopts.hpp>
-#include <fts.hpp>
+#include <fts/fts.hpp>
 #include <iostream>
 
 int main(int argc, char **argv) {
