@@ -31,6 +31,7 @@ target_include_directories(
 target_link_libraries(
   ${test_name}
   GTest::gtest_main
+  fts
 )
 
 include(GoogleTest)
