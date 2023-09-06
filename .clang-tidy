@@ -14,9 +14,11 @@ Checks: >
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -cppcoreguidelines-avoid-magic-numbers,
   -readability-identifier-length,
-  -readability-magic-numbers
+  -readability-magic-numbers,
+  -cert-err58-cpp,
+  -cppcoreguidelines-avoid-non-const-global-variables
 WarningsAsErrors: '*'
-HeaderFilterRegex: 'include/fts/'
+HeaderFilterRegex: 'include/(fts)'
 AnalyzeTemporaryDtors: false
 FormatStyle:     none
 User:            allenvox
