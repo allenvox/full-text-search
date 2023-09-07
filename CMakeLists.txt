@@ -17,8 +17,5 @@ endif()
 
 enable_testing()
 
-set(CXXOPTS_BUILD_EXAMPLES OFF)
-set(CXXOPTS_BUILD_TESTS OFF)
-
 add_subdirectory(external)
 add_subdirectory(src)
