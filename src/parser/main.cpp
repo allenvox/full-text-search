@@ -12,7 +12,7 @@ NgramText get_user_input(const NgramText &message) {
 
 int main() {
     const NgramText text = get_user_input("Enter the text to be parsed:");
-    NgramParser parser;
+    const NgramParser parser;
     const NgramStopWords stop_words = parser.split_in_words(
         get_user_input("Enter the stop words separated with spaces:"), ' ');
     const NgramLength minlen = static_cast<size_t>(
