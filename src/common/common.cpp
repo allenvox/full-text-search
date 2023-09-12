@@ -60,7 +60,7 @@ NgramParser::generate_ngrams(const NgramWords &words,
             if (std::find(stop_words.begin(), stop_words.end(), ngram) ==
                 stop_words.end()) {
                 ngrams.push_back(ngram + ' ' +
-                                 std::to_string(&word - &words[0]));
+                                 std::to_string(&word - words.data()));
             }
         }
     }
