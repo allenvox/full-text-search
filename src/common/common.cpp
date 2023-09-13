@@ -73,7 +73,7 @@ NgramWords NgramParser::parse(const std::string &text,
                               NgramLength ngram_max_length) const {
     const NgramText clear = clear_text(text);
     const NgramWords words =
-        remove_stop_words(split_in_words(clear, ' '), stop_words);
+        remove_stop_words(split_in_words(clear), stop_words);
 
     // generate a vector of ngrams
     NgramWords ngrams =
