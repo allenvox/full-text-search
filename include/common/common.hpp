@@ -22,10 +22,10 @@ class NgramParser : public Parser {
     NgramText clear_text(const NgramText &source) const;
 
     NgramWords split_in_words(const NgramText &text,
-                              const char separator) const;
+                              const char separator = ' ') const;
 
     NgramWords remove_stop_words(const NgramWords &words,
-                                     const NgramStopWords &stop_words) const;
+                                 const NgramStopWords &stop_words) const;
 
     NgramWords generate_ngrams(const NgramWords &words,
                                const NgramStopWords &stop_words,
