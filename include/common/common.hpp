@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <unordered_set>
 #include <vector>
 
 using NgramStopWords = std::vector<std::string>;
@@ -25,7 +24,7 @@ class NgramParser : public Parser {
     NgramWords split_in_words(const NgramText &text,
                               const char separator) const;
 
-    NgramStopWords remove_stop_words(const NgramWords &words,
+    NgramWords remove_stop_words(const NgramWords &words,
                                      const NgramStopWords &stop_words) const;
 
     NgramWords generate_ngrams(const NgramWords &words,
