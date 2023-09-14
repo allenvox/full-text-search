@@ -55,25 +55,28 @@ NgramParser::remove_stop_words(const NgramWords &words,
     return words_without_stops;
 }
 
-NgramPairs
+NgramVec
 NgramParser::generate_ngrams(const NgramWords &words,
                              const NgramStopWords &stop_words,
                              const NgramLength ngram_min_length,
                              const NgramLength ngram_max_length) const {
-    NgramPairs ngrams;
+    NgramVec ngrams;
     for (const NgramWord &word : words) {
         for (NgramLength length = ngram_min_length;
              length <= ngram_max_length && length <= word.length(); length++) {
             const NgramWord ngram_text = word.substr(0, length);
             if (!is_stop_word(ngram_text, stop_words)) {
-                NgramPair ngram_pair(ngram_text, &word - words.data());
+                Ngram ngram;
+                ngram.text = ngram_text;
+                ngram.pos = &word - words.data();
+                ngrams.push_back(ngram);
             }
         }
     }
     return ngrams;
 }
 
-NgramPairs NgramParser::parse(const NgramText &text,
+NgramVec NgramParser::parse(const NgramText &text,
                               const NgramStopWords &stop_words,
                               NgramLength ngram_min_length,
                               NgramLength ngram_max_length) const {
@@ -82,7 +85,7 @@ NgramPairs NgramParser::parse(const NgramText &text,
         remove_stop_words(split_in_words(clear), stop_words);
 
     // generate a vector of ngrams
-    NgramPairs ngrams =
+    NgramVec ngrams =
         generate_ngrams(words, stop_words, ngram_min_length, ngram_max_length);
     return ngrams;
 }

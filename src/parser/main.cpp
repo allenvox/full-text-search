@@ -19,10 +19,10 @@ int main() {
         std::stoi(get_user_input("Enter minimum ngram length:")));
     const NgramLength maxlen = static_cast<size_t>(
         std::stoi(get_user_input("Enter maximum ngram length:")));
-    for (const NgramWord &token :
+    for (const Ngram &ngram :
          parser.parse(text, stop_words, minlen, maxlen)) {
-        std::cout << token << ' ';
+        std::cout << ngram.text << ' ' << ngram.pos;
     }
-    std::cout << "\n";
+    std::cout << std::endl;
     return 0;
 }
