@@ -10,19 +10,20 @@ using NgramLength = std::size_t;
 using NgramIndex = std::size_t;
 using NgramText = std::string;
 using NgramWord = std::string;
-using NgramVec = std::vector<Ngram>;
 
-struct {
-  NgramWord text;
-  NgramIndex pos;
-} Ngram;
+using Ngram = struct {
+    NgramWord text;
+    NgramIndex pos;
+};
+
+using NgramVec = std::vector<Ngram>;
 
 class Parser {
   public:
     virtual NgramVec parse(const NgramText &text,
-                             const NgramStopWords &stop_words,
-                             NgramLength ngram_min_length,
-                             NgramLength ngram_max_length) const = 0;
+                           const NgramStopWords &stop_words,
+                           NgramLength ngram_min_length,
+                           NgramLength ngram_max_length) const = 0;
 };
 
 class NgramParser : public Parser {
@@ -39,11 +40,11 @@ class NgramParser : public Parser {
                                  const NgramStopWords &stop_words) const;
 
     NgramVec generate_ngrams(const NgramWords &words,
-                               const NgramStopWords &stop_words,
-                               const NgramLength ngram_min_length,
-                               const NgramLength ngram_max_length) const;
+                             const NgramStopWords &stop_words,
+                             const NgramLength ngram_min_length,
+                             const NgramLength ngram_max_length) const;
 
     NgramVec parse(const NgramText &text, const NgramStopWords &stop_words,
-                     const NgramLength ngram_min_length,
-                     const NgramLength ngram_max_length) const override;
+                   const NgramLength ngram_min_length,
+                   const NgramLength ngram_max_length) const override;
 };

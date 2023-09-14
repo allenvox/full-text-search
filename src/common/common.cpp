@@ -5,8 +5,8 @@
 #include <cctype>
 #include <string>
 
-bool is_stop_word(const NgramWord &word,
-                  const NgramStopWords &stop_words) const {
+bool NgramParser::is_stop_word(const NgramWord &word,
+                               const NgramStopWords &stop_words) const {
     return std::find(stop_words.begin(), stop_words.end(), word) !=
            stop_words.end();
 }
@@ -77,9 +77,9 @@ NgramParser::generate_ngrams(const NgramWords &words,
 }
 
 NgramVec NgramParser::parse(const NgramText &text,
-                              const NgramStopWords &stop_words,
-                              NgramLength ngram_min_length,
-                              NgramLength ngram_max_length) const {
+                            const NgramStopWords &stop_words,
+                            NgramLength ngram_min_length,
+                            NgramLength ngram_max_length) const {
     const NgramText clear = clear_text(text);
     const NgramWords words =
         remove_stop_words(split_in_words(clear), stop_words);
