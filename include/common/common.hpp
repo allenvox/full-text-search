@@ -2,12 +2,15 @@
 
 #include <string>
 #include <vector>
+#include <utility>
 
 using NgramStopWords = std::vector<std::string>;
 using NgramWords = std::vector<std::string>;
 using NgramLength = std::size_t;
+using NgramIndex = std::size_t;
 using NgramText = std::string;
 using NgramWord = std::string;
+using NgramPairs = std::vector<std::pair<NgramWord, NgramIndex>>;
 
 class Parser {
   public:
@@ -19,6 +22,9 @@ class Parser {
 
 class NgramParser : public Parser {
   public:
+    bool is_stop_word(const NgramWord &word,
+                      const NgramStopWords &stop_words) const;
+
     NgramText clear_text(const NgramText &source) const;
 
     NgramWords split_in_words(const NgramText &text,
@@ -27,7 +33,7 @@ class NgramParser : public Parser {
     NgramWords remove_stop_words(const NgramWords &words,
                                  const NgramStopWords &stop_words) const;
 
-    NgramWords generate_ngrams(const NgramWords &words,
+    NgramPairs generate_ngrams(const NgramWords &words,
                                const NgramStopWords &stop_words,
                                const NgramLength ngram_min_length,
                                const NgramLength ngram_max_length) const;
