@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <utility>
 #include <vector>
 
 using NgramStopWords = std::vector<std::string>;
@@ -10,12 +9,11 @@ using NgramLength = std::size_t;
 using NgramIndex = std::size_t;
 using NgramText = std::string;
 using NgramWord = std::string;
-
-using Ngram = struct {
-    NgramWord text;
-    NgramIndex pos;
+struct Ngram {
+    std::string text;
+    std::size_t pos;
 };
-
+using Ngram = struct Ngram;
 using NgramVec = std::vector<Ngram>;
 
 class Parser {
