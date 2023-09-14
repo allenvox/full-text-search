@@ -21,7 +21,8 @@ Checks: >
   -bugprone-easily-swappable-parameters,
   -google-runtime-int,
   -cppcoreguidelines-init-variables,
-  -bugprone-exception-escape
+  -bugprone-exception-escape,
+  -readability-redundant-string-init
 WarningsAsErrors: '*'
 HeaderFilterRegex: 'include/(fts)'
 AnalyzeTemporaryDtors: false
