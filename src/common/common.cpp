@@ -5,6 +5,10 @@
 #include <cctype>
 #include <string>
 
+bool is_stop_word(const NgramWord &word, const NgramStopWords &stop_words) const {
+    return std::find(stop_words.begin(), stop_words.end(), word) != stop_words.end();
+}
+
 NgramText NgramParser::clear_text(const NgramText &source) const {
     NgramText text; // buffer for formatted text
     // remove punctuation marks
@@ -37,28 +41,27 @@ NgramWords NgramParser::split_in_words(const NgramText &text,
 NgramWords
 NgramParser::remove_stop_words(const NgramWords &words,
                                const NgramStopWords &stop_words) const {
-    NgramWords removed_stop_words;
+    NgramWords words_without_stops;
     for (const NgramWord &word : words) {
-        if (std::find(stop_words.begin(), stop_words.end(), word) ==
-            stop_words.end()) {
-            removed_stop_words.push_back(word);
+        if (!is_stop_word(word, stop_words)) {
+            words_without_stops.push_back(word);
         }
     }
-    return removed_stop_words;
+    return words_without_stops;
 }
 
-NgramWords
+NgramPairs
 NgramParser::generate_ngrams(const NgramWords &words,
                              const NgramStopWords &stop_words,
                              const NgramLength ngram_min_length,
                              const NgramLength ngram_max_length) const {
-    NgramWords ngrams;
+    NgramPairs ngrams;
     for (const NgramWord &word : words) {
         for (NgramLength length = ngram_min_length;
              length <= ngram_max_length && length <= word.length(); length++) {
             const NgramWord ngram = word.substr(0, length);
-            if (std::find(stop_words.begin(), stop_words.end(), ngram) ==
-                stop_words.end()) {
+            if (!is_stop_word(ngram, stop_words)) {
+                ngrams.push_back();
                 ngrams.push_back(ngram + ' ' +
                                  std::to_string(&word - words.data()));
             }
@@ -67,7 +70,7 @@ NgramParser::generate_ngrams(const NgramWords &words,
     return ngrams;
 }
 
-NgramWords NgramParser::parse(const std::string &text,
+NgramWords NgramParser::parse(const NgramText &text,
                               const NgramStopWords &stop_words,
                               NgramLength ngram_min_length,
                               NgramLength ngram_max_length) const {
