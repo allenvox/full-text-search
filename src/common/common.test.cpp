@@ -73,10 +73,13 @@ TEST(GenerateNgramsTest, Trivial) {
     const NgramWords input{"jekyll", "hyde"};
     const NgramLength minlen = 3;
     const NgramLength maxlen = 6;
-    const NgramWords result = parser.generate_ngrams(input, {}, minlen, maxlen);
-    const NgramWords expected{"jek 0",    "jeky 0", "jekyl 0",
-                              "jekyll 0", "hyd 1",  "hyde 1"};
-    EXPECT_EQ(expected, result);
+    NgramVec result = parser.generate_ngrams(input, {}, minlen, maxlen);
+    NgramVec expected{{"jek", 0},    {"jeky", 0}, {"jekyl", 0},
+                      {"jekyll", 0}, {"hyd", 1},  {"hyde", 1}};
+    for (NgramIndex i = 0; i < expected.size(); ++i) {
+        EXPECT_EQ(result[i].text, expected[i].text);
+        EXPECT_EQ(result[i].pos, expected[i].pos);
+    }
 }
 
 TEST(GenerateNgramsTest, NoWords) {
@@ -84,9 +87,12 @@ TEST(GenerateNgramsTest, NoWords) {
     const NgramWords input{};
     const NgramLength minlen = 3;
     const NgramLength maxlen = 6;
-    const NgramWords result = parser.generate_ngrams(input, {}, minlen, maxlen);
-    const NgramWords expected;
-    EXPECT_EQ(expected, result);
+    NgramVec result = parser.generate_ngrams(input, {}, minlen, maxlen);
+    NgramVec expected;
+    for (NgramIndex i = 0; i < expected.size(); ++i) {
+        EXPECT_EQ(result[i].text, expected[i].text);
+        EXPECT_EQ(result[i].pos, expected[i].pos);
+    }
 }
 
 TEST(ParseTest, Trivial) {
@@ -95,10 +101,13 @@ TEST(ParseTest, Trivial) {
     const NgramStopWords stop_words{"and", "dr", "mr"};
     const NgramLength minlen = 3;
     const NgramLength maxlen = 6;
-    const NgramWords result = parser.parse(input, stop_words, minlen, maxlen);
-    const NgramWords expected{"jek 0",    "jeky 0", "jekyl 0",
-                              "jekyll 0", "hyd 1",  "hyde 1"};
-    EXPECT_EQ(expected, result);
+    NgramVec result = parser.parse(input, stop_words, minlen, maxlen);
+    NgramVec expected{{"jek", 0},    {"jeky", 0}, {"jekyl", 0},
+                      {"jekyll", 0}, {"hyd", 1},  {"hyde", 1}};
+    for (NgramIndex i = 0; i < expected.size(); ++i) {
+        EXPECT_EQ(result[i].text, expected[i].text);
+        EXPECT_EQ(result[i].pos, expected[i].pos);
+    }
 }
 
 TEST(ParseTest, NoWords) {
@@ -107,9 +116,12 @@ TEST(ParseTest, NoWords) {
     const NgramStopWords stop_words{"and", "dr", "mr"};
     const NgramLength minlen = 3;
     const NgramLength maxlen = 6;
-    const NgramWords result = parser.parse(input, stop_words, minlen, maxlen);
-    const NgramWords expected;
-    EXPECT_EQ(expected, result);
+    NgramVec result = parser.parse(input, stop_words, minlen, maxlen);
+    NgramVec expected;
+    for (NgramIndex i = 0; i < expected.size(); ++i) {
+        EXPECT_EQ(result[i].text, expected[i].text);
+        EXPECT_EQ(result[i].pos, expected[i].pos);
+    }
 }
 
 int main(int argc, char *argv[]) {
