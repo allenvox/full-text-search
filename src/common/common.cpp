@@ -11,12 +11,15 @@ bool is_stop_word(const NgramWord &word, const NgramStopWords &stop_words) const
 
 NgramText NgramParser::clear_text(const NgramText &source) const {
     NgramText text; // buffer for formatted text
+    text.reserve(source.length());
+
     // remove punctuation marks
     for (const char c : source) {
         if (std::ispunct(c) == 0) {
             text += c;
         }
     }
+    
     // make lowercase
     std::transform(text.begin(), text.end(), text.begin(),
                    static_cast<int (*)(int)>(std::tolower));
