@@ -5,8 +5,10 @@
 #include <cctype>
 #include <string>
 
-bool is_stop_word(const NgramWord &word, const NgramStopWords &stop_words) const {
-    return std::find(stop_words.begin(), stop_words.end(), word) != stop_words.end();
+bool is_stop_word(const NgramWord &word,
+                  const NgramStopWords &stop_words) const {
+    return std::find(stop_words.begin(), stop_words.end(), word) !=
+           stop_words.end();
 }
 
 NgramText NgramParser::clear_text(const NgramText &source) const {
@@ -19,7 +21,7 @@ NgramText NgramParser::clear_text(const NgramText &source) const {
             text += c;
         }
     }
-    
+
     // make lowercase
     std::transform(text.begin(), text.end(), text.begin(),
                    static_cast<int (*)(int)>(std::tolower));
@@ -62,18 +64,16 @@ NgramParser::generate_ngrams(const NgramWords &words,
     for (const NgramWord &word : words) {
         for (NgramLength length = ngram_min_length;
              length <= ngram_max_length && length <= word.length(); length++) {
-            const NgramWord ngram = word.substr(0, length);
-            if (!is_stop_word(ngram, stop_words)) {
-                ngrams.push_back();
-                ngrams.push_back(ngram + ' ' +
-                                 std::to_string(&word - words.data()));
+            const NgramWord ngram_text = word.substr(0, length);
+            if (!is_stop_word(ngram_text, stop_words)) {
+                NgramPair ngram_pair(ngram_text, &word - words.data());
             }
         }
     }
     return ngrams;
 }
 
-NgramWords NgramParser::parse(const NgramText &text,
+NgramPairs NgramParser::parse(const NgramText &text,
                               const NgramStopWords &stop_words,
                               NgramLength ngram_min_length,
                               NgramLength ngram_max_length) const {
@@ -82,7 +82,7 @@ NgramWords NgramParser::parse(const NgramText &text,
         remove_stop_words(split_in_words(clear), stop_words);
 
     // generate a vector of ngrams
-    NgramWords ngrams =
+    NgramPairs ngrams =
         generate_ngrams(words, stop_words, ngram_min_length, ngram_max_length);
     return ngrams;
 }
