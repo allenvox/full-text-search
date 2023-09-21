@@ -16,7 +16,13 @@ Checks: >
   -readability-identifier-length,
   -readability-magic-numbers,
   -cert-err58-cpp,
-  -cppcoreguidelines-avoid-non-const-global-variables
+  -cppcoreguidelines-avoid-non-const-global-variables,
+  -readability-convert-member-functions-to-static,
+  -bugprone-easily-swappable-parameters,
+  -google-runtime-int,
+  -cppcoreguidelines-init-variables,
+  -bugprone-exception-escape,
+  -readability-redundant-string-init
 WarningsAsErrors: '*'
 HeaderFilterRegex: 'include/(fts)'
 AnalyzeTemporaryDtors: false

@@ -15,14 +15,14 @@ int main(int argc, char **argv) {
 
         const auto result = options.parse(argc, argv);
         if (result.count("first") != 1 && result.count("second") != 1) {
-            std::cout << options.help() << "\n";
+            std::cout << options.help() << '\n';
             return 0;
         }
         const auto a = result["first"].as<double>();
         const auto b = result["second"].as<double>();
-        std::cout << fts::sum(a, b) << "\n";
+        std::cout << fts::sum(a, b) << '\n';
     } catch (const std::exception &e) {
-        std::cerr << e.what() << "\n";
+        std::cerr << e.what() << '\n';
         return 1;
     }
 }
