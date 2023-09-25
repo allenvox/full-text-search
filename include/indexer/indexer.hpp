@@ -11,20 +11,20 @@ struct IndexDocument {
     IndexText text;
 };
 using IndexDocument = struct IndexDocument;
-using IndexDocumentsVec = std::vector<IndexDocument>;
-
+using IndexDocuments = std::vector<IndexDocument>;
 using IndexIdx = std::size_t;
+
 struct IndexEntry {
     IndexID doc_id;
     IndexIdx pos;
 };
 using IndexEntry = struct IndexEntry;
-using IndexEntriesVec = std::vector<IndexEntry>;
+using IndexEntries = std::vector<IndexEntry>;
 
 class Index {
 public:
-    IndexDocumentsVec docs;
-    IndexEntriesVec entries;
+    IndexDocuments docs;
+    IndexEntries entries;
 };
 
 class IndexBuilder {
