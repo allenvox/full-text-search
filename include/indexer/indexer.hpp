@@ -2,16 +2,12 @@
 
 #include <common/common.hpp>
 #include <filesystem>
+#include <unordered_map>
 #include <vector>
 
 using IndexID = std::size_t;
 using IndexText = std::string;
-struct IndexDocument {
-    IndexID id;
-    IndexText text;
-};
-using IndexDocument = struct IndexDocument;
-using IndexDocuments = std::vector<IndexDocument>;
+using IndexDocuments = std::unordered_map<IndexID, IndexText>;
 using IndexIdx = std::size_t;
 
 struct IndexEntry {
@@ -19,7 +15,9 @@ struct IndexEntry {
     IndexIdx pos;
 };
 using IndexEntry = struct IndexEntry;
-using IndexEntries = std::vector<IndexEntry>;
+using IndexHash = std::string;
+using IndexTerm = std::string;
+using IndexEntries = std::unordered_map<IndexTerm, std::vector<IndexEntry>>;
 
 class Index {
 public:
@@ -46,11 +44,7 @@ public:
     virtual void write(IndexPath path, Index index) const = 0;
 };
 
-using IndexHash = std::string;
-using IndexTerm = std::string;
-using IndexCount = std::size_t;
-
 class TextIndexWriter : public IndexWriter {
 public:
-    void write(IndexPath path, Index index) override;
+    void write(IndexPath path, Index index) const override;
 };
