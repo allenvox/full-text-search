@@ -1,5 +1,7 @@
 #pragma once
 
+#include <common/common.hpp>
+#include <filesystem>
 #include <vector>
 
 using IndexID = std::size_t;
@@ -27,23 +29,28 @@ public:
 
 class IndexBuilder {
 public:
-    Index index;
-    void add_document(IndexDocument doc);
+    IndexBuilder(NgramStopWords stop_words, NgramLength min_length, NgramStopWords max_length);
+    Index index() const;
     void add_document(IndexID id, IndexText text);
+private:
+    Index index_;
+    NgramStopWords stop_words_;
+    NgramLength min_length_;
+    NgramLength max_length_;
 };
 
-using IndexPath = std::string;
+using IndexPath = std::filesystem::path;
 
 class IndexWriter {
 public:
-    virtual void write(IndexPath path, Index index);
-};
-
-class TextIndexWriter : public IndexWriter {
-public:
-    void write(IndexPath path, Index index) override;
+    virtual void write(IndexPath path, Index index) const = 0;
 };
 
 using IndexHash = std::string;
 using IndexTerm = std::string;
 using IndexCount = std::size_t;
+
+class TextIndexWriter : public IndexWriter {
+public:
+    void write(IndexPath path, Index index) override;
+};
