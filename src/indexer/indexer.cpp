@@ -1,15 +1,5 @@
 #include <indexer/indexer.hpp>
-#include <picosha2>
-
-IndexBuilder::IndexBuilder(NgramStopWords stop_words, NgramLength min_length, NgramStopWords max_length) {
-    stop_words_ = std::move(stop_words);
-    min_length_ = std::move(min_length);
-    max_length_ = std::move(max_length);
-}
-
-Index IndexBuilder::index() {
-    return index_;
-}
+#include <picosha2.h>
 
 void IndexBuilder::add_document(IndexID id, IndexText text) {
     index_.docs.insert({id, text});
@@ -22,7 +12,7 @@ void IndexBuilder::add_document(IndexID id, IndexText text) {
     }
 }
 
-IndexHash term_to_hash(const IndexTerm term) const {
+IndexHash term_to_hash(const IndexTerm& term) const {
     return picosha2::hash256_hex_string(term).substr(0, 6);
 }
 
@@ -45,17 +35,28 @@ void write_docs(const IndexPath& path, const IndexDocuments& docs) {
     }
 }
 
-IndexText convert_to_entry_output(const IndexTerm& term, const IndexEntry& entry) {
-
+IndexText convert_to_entry_output(const IndexTerm& term, const std::vector<IndexDocToPos>& doc_to_pos_vec) {
+    IndexText output(term + ' ' + std::to_string(doc_to_pos_vec.size()) + ' ');
+    for (const auto& doc_to_pos : doc_to_pos_vec) {
+        const auto doc_id = doc_to_pos.doc_id;
+        const auto pos = doc_to_pos.pos;
+        output.append(std::to_string(doc_id) + ' ' + std::to_string(doc_to_pos_vec.count(doc_id)) + ' ');
+        for (auto [beg_entries, end_entries] = doc_to_pos_vec.equal_range(doc_id);
+             beg_entries != end_entries; ++beg_entries) {
+            output.append(std::to_string(beg_entries->second) + ' ');
+        }
+    }
+    output.append('\n');
+    return output;
 }
 
 void write_entries(const IndexPath& path, const IndexEntries& entries) {
-    for (const auto& [term, entries_vec] : entries) {
+    for (const auto& [term, doc_to_pos_vec] : entries) {
         std::ofstream out_file(path / "index" / "entries" / term_to_hash(term));
         if (!out_file.is_open()) {
             throw_index_fs_error();
         }
-        const IndexText out_text = convert_to_entry_output(term, entries_vec);
+        const IndexText out_text = convert_to_entry_output(term, doc_to_pos_vec);
         out_file << out_text;
         out_file.close();
     }
