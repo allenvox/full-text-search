@@ -18,7 +18,7 @@ target_include_directories(
 target_link_libraries(
   ${target_name}
   PRIVATE
-    picosha2
+    common
 )
 
 set(test_name indexer.test)
@@ -34,6 +34,7 @@ target_include_directories(
   ${test_name}
   PUBLIC
     ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_BINARY_DIR}/_deps/picosha2-src
 )
 
 target_link_libraries(
