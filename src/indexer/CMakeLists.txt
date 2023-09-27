@@ -2,7 +2,8 @@ set(target_name indexer)
 
 add_library(${target_name} STATIC
   ${PROJECT_SOURCE_DIR}/include/${target_name}/${target_name}.hpp
-  indexer.cpp)
+  indexer.cpp
+)
 
 include(CompileOptions)
 set_compile_options(${target_name})
@@ -11,6 +12,7 @@ target_include_directories(
   ${target_name}
   PUBLIC
     ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_BINARY_DIR}/_deps/picosha2-src
 )
 
 target_link_libraries(
