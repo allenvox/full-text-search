@@ -1,19 +1,23 @@
+#include <fstream>
 #include <indexer/indexer.hpp>
 #include <picosha2.h>
+#include <string>
 
-void IndexBuilder::add_document(IndexID id, IndexText text) {
+void IndexBuilder::add_document(IndexID id, const IndexText& text) {
     index_.docs.insert({id, text});
     NgramParser parser;
     NgramVec ngrams = parser.parse(text, stop_words_, min_length_, max_length_);
-    for (NgramIndex pos = 0, end = ngrams.size(); pos != end; pos++) {
-        for (const auto& term : ngrams[pos]) {
-            index_.entries_[term].insert({id, pos});
-        }
+    for(const auto& ngram : ngrams) {
+        index_.entries[ngram.text].push_back({id, ngram.pos});
     }
 }
 
-IndexHash term_to_hash(const IndexTerm& term) const {
+IndexHash term_to_hash(const IndexTerm& term) {
     return picosha2::hash256_hex_string(term).substr(0, 6);
+}
+
+void throw_index_fs_error() {
+    throw std::runtime_error("Can't create index file");
 }
 
 void create_index_directories(const IndexPath& path) {
@@ -37,16 +41,21 @@ void write_docs(const IndexPath& path, const IndexDocuments& docs) {
 
 IndexText convert_to_entry_output(const IndexTerm& term, const std::vector<IndexDocToPos>& doc_to_pos_vec) {
     IndexText output(term + ' ' + std::to_string(doc_to_pos_vec.size()) + ' ');
-    for (const auto& doc_to_pos : doc_to_pos_vec) {
-        const auto doc_id = doc_to_pos.doc_id;
-        const auto pos = doc_to_pos.pos;
-        output.append(std::to_string(doc_id) + ' ' + std::to_string(doc_to_pos_vec.count(doc_id)) + ' ');
-        for (auto [beg_entries, end_entries] = doc_to_pos_vec.equal_range(doc_id);
-             beg_entries != end_entries; ++beg_entries) {
-            output.append(std::to_string(beg_entries->second) + ' ');
+    std::vector<IndexID> already_outputed;
+    for (const auto& doc_to_pos1 : doc_to_pos_vec) {
+        const auto& id = doc_to_pos1.doc_id;
+        if(std::count(already_outputed.begin(), already_outputed.end(), id) == 1) {
+            continue;
         }
+        output.append(std::to_string(id) + ' ' + std::to_string(std::count_if(doc_to_pos_vec.begin(), doc_to_pos_vec.end(), [&](const IndexDocToPos& s) { return s.doc_id == id; }) + ' '));
+        for(const auto& doc_to_pos2 : doc_to_pos_vec) {
+            if(doc_to_pos2.doc_id == id) {
+                output.append(std::to_string(doc_to_pos2.pos) + ' ');
+            }
+        }
+        already_outputed.push_back(id);
     }
-    output.append('\n');
+    output.append("\n");
     return output;
 }
 
@@ -56,18 +65,13 @@ void write_entries(const IndexPath& path, const IndexEntries& entries) {
         if (!out_file.is_open()) {
             throw_index_fs_error();
         }
-        const IndexText out_text = convert_to_entry_output(term, doc_to_pos_vec);
-        out_file << out_text;
+        out_file << convert_to_entry_output(term, doc_to_pos_vec);
         out_file.close();
     }
 }
 
-void throw_index_fs_error() {
-    throw std::runtime_error("Can't create index file");
-}
-
-void TextIndexWriter::write(IndexPath path, Index index) const override {
+void TextIndexWriter::write(IndexPath path, Index index) const {
     create_index_directories(path);
-    write_docs(path, index.docs_);
-    write_entries(path, index.entries_);
+    write_docs(path, index.docs);
+    write_entries(path, index.entries);
 }
