@@ -1,4 +1,4 @@
-set(target_name indexer)
+set(target_name indexer_cli)
 
 add_executable(${target_name})
 
