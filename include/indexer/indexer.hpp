@@ -10,14 +10,14 @@ using IndexText = std::string;
 using IndexDocuments = std::unordered_map<IndexID, IndexText>;
 using IndexIdx = std::size_t;
 
-struct IndexEntry {
+struct IndexDocToPos {
     IndexID doc_id;
     IndexIdx pos;
 };
-using IndexEntry = struct IndexEntry;
+using IndexDocToPos = struct IndexDocToPos;
 using IndexHash = std::string;
 using IndexTerm = std::string;
-using IndexEntries = std::unordered_map<IndexTerm, std::vector<IndexEntry>>;
+using IndexEntries = std::unordered_map<IndexTerm, std::vector<IndexDocToPos>>;
 
 class Index {
 public:
@@ -27,8 +27,11 @@ public:
 
 class IndexBuilder {
 public:
-    IndexBuilder(NgramStopWords stop_words, NgramLength min_length, NgramStopWords max_length);
-    Index index() const;
+    IndexBuilder(NgramStopWords stop_words, NgramLength min_length, NgramLength max_length)
+                : stop_words_(std::move(stop_words)),
+                  min_length_(std::move(min_length)),
+                  max_length_(std::move(max_length)) {};
+    Index index() const { return index_; };
     void add_document(IndexID id, IndexText text);
 private:
     Index index_;
