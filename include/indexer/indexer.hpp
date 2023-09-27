@@ -32,7 +32,8 @@ public:
                   min_length_(std::move(min_length)),
                   max_length_(std::move(max_length)) {};
     Index index() const { return index_; };
-    void add_document(IndexID id, IndexText text);
+    void add_document(IndexID id, const IndexText& text);
+
 private:
     Index index_;
     NgramStopWords stop_words_;
@@ -49,5 +50,5 @@ public:
 
 class TextIndexWriter : public IndexWriter {
 public:
-    void write(IndexPath path, Index index) const override;
+    void write(IndexPath path, Index index) const;
 };
