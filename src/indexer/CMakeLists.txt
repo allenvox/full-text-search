@@ -13,6 +13,12 @@ target_include_directories(
     ${PROJECT_SOURCE_DIR}/include
 )
 
+target_link_libraries(
+  ${target_name}
+  PRIVATE
+    picosha2
+)
+
 set(test_name indexer.test)
 
 add_executable(
