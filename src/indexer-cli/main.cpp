@@ -15,13 +15,13 @@ int main() {
     indexbuilder.add_document(200305, "The Matrix Reloaded");
     indexbuilder.add_document(200311, "The Matrix Revolution");
     Index index = indexbuilder.index();
-    
+
     std::string out_path = get_user_input("Enter output path for index:");
     const std::filesystem::path path = out_path;
 
     TextIndexWriter writer;
     writer.write(path, index);
-    
+
     std::cout << std::endl;
     return 0;
 }
