@@ -6,19 +6,19 @@
 
 TEST(IndexBuilderTest, AddDocument) {
     IndexBuilder builder({"the"}, 3, 6);
-    IndexID id = 1;
-    IndexText text = "The Matrix";
+    const IndexID id = 1;
+    const IndexText text = "The Matrix";
     builder.add_document(id, text);
-    Index index = builder.index();
+    const Index index = builder.index();
     ASSERT_EQ(index.docs.size(), 1);
     ASSERT_EQ(index.entries.size(), 4); // 4 ngrams
     EXPECT_EQ(index.docs[id], text);
 }
 
 TEST(IndexerUtilsTest, TermToHashSize) {
-    IndexTerm term = "example_term";
-    IndexHash hash = indexer::term_to_hash(term);
-    std::size_t expected = 6;
+    const IndexTerm term = "example_term";
+    const IndexHash hash = indexer::term_to_hash(term);
+    const std::size_t expected = 6;
     EXPECT_EQ(expected, hash.size());
 }
 
@@ -31,10 +31,12 @@ TEST(IndexerUtilsTest, CreateIndexDirectories) {
 }
 
 TEST(IndexerUtilsTest, ConvertToEntryOutput) {
-    IndexTerm term = "matrix";
-    std::vector<IndexDocToPos> doc_to_pos_vec = {{11, 0}, {22, 0}, {22, 1}};
-    IndexText output = indexer::convert_to_entry_output(term, doc_to_pos_vec);
-    std::string expected_output = "matrix 3 11 1 0 22 2 0 1 \n";
+    const IndexTerm term = "matrix";
+    const std::vector<IndexDocToPos> doc_to_pos_vec = {
+        {11, 0}, {22, 0}, {22, 1}};
+    const IndexText output =
+        indexer::convert_to_entry_output(term, doc_to_pos_vec);
+    const std::string expected_output = "matrix 3 11 1 0 22 2 0 1 \n";
     EXPECT_EQ(output, expected_output);
 }
 
@@ -43,9 +45,9 @@ TEST(TextIndexWriterTest, Write) {
     indexbuilder.add_document(199903, "The Matrix");
     indexbuilder.add_document(200305, "The Matrix Reloaded");
     indexbuilder.add_document(200311, "The Matrix Revolution");
-    Index index = indexbuilder.index();
-    IndexPath testPath = "./build/test_index";
-    TextIndexWriter writer;
+    const Index index = indexbuilder.index();
+    const IndexPath testPath = "./build/test_index";
+    const TextIndexWriter writer;
     writer.write(testPath, index);
 
     // get text from doc1 and check it
