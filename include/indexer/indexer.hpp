@@ -20,21 +20,22 @@ using IndexTerm = std::string;
 using IndexEntries = std::unordered_map<IndexTerm, std::vector<IndexDocToPos>>;
 
 class Index {
-public:
+  public:
     IndexDocuments docs;
     IndexEntries entries;
 };
 
 class IndexBuilder {
-public:
-    IndexBuilder(NgramStopWords stop_words, NgramLength min_length, NgramLength max_length)
-                : stop_words_(std::move(stop_words)),
-                  min_length_(std::move(min_length)),
-                  max_length_(std::move(max_length)) {};
+  public:
+    IndexBuilder(NgramStopWords stop_words, NgramLength min_length,
+                 NgramLength max_length)
+        : stop_words_(std::move(stop_words)),
+          min_length_(std::move(min_length)),
+          max_length_(std::move(max_length)){};
     Index index() const { return index_; };
-    void add_document(IndexID id, const IndexText& text);
+    void add_document(IndexID id, const IndexText &text);
 
-private:
+  private:
     Index index_;
     NgramStopWords stop_words_;
     NgramLength min_length_;
@@ -44,11 +45,24 @@ private:
 using IndexPath = std::filesystem::path;
 
 class IndexWriter {
-public:
+  public:
     virtual void write(IndexPath path, Index index) const = 0;
 };
 
 class TextIndexWriter : public IndexWriter {
-public:
+  public:
     void write(IndexPath path, Index index) const;
 };
+
+namespace indexer {
+
+IndexHash term_to_hash(const IndexTerm &term);
+void throw_index_fs_error();
+void create_index_directories(const IndexPath &path);
+void write_docs(const IndexPath &path, const IndexDocuments &docs);
+IndexText
+convert_to_entry_output(const IndexTerm &term,
+                        const std::vector<IndexDocToPos> &doc_to_pos_vec);
+void write_entries(const IndexPath &path, const IndexEntries &entries);
+
+} // namespace indexer
