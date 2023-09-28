@@ -29,9 +29,8 @@ class IndexBuilder {
   public:
     IndexBuilder(NgramStopWords stop_words, NgramLength min_length,
                  NgramLength max_length)
-        : stop_words_(std::move(stop_words)),
-          min_length_(std::move(min_length)),
-          max_length_(std::move(max_length)){};
+        : stop_words_(std::move(stop_words)), min_length_(min_length),
+          max_length_(max_length){};
     Index index() const { return index_; };
     void add_document(IndexID id, const IndexText &text);
 
