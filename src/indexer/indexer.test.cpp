@@ -12,7 +12,12 @@ TEST(IndexBuilderTest, AddDocument) {
     const Index index = builder.index();
     ASSERT_EQ(index.docs.size(), 1);
     ASSERT_EQ(index.entries.size(), 4); // 4 ngrams
-    EXPECT_EQ(index.docs[id], text);
+    IndexText doc_text = "";
+    auto it = index.docs.find(id);
+    if (it != index.docs.end()) {
+        doc_text = it->second;
+    }
+    EXPECT_EQ(doc_text, text);
 }
 
 TEST(IndexerUtilsTest, TermToHashSize) {
