@@ -1,6 +1,7 @@
 #pragma once
 
 #include <common/common.hpp>
+#include <config/config.hpp>
 #include <filesystem>
 #include <unordered_map>
 #include <vector>
@@ -29,16 +30,13 @@ class IndexBuilder {
   public:
     IndexBuilder(NgramStopWords stop_words, NgramLength min_length,
                  NgramLength max_length)
-        : stop_words_(std::move(stop_words)), min_length_(min_length),
-          max_length_(max_length){};
+        : config_({std::move(stop_words), min_length, max_length}){};
     Index index() const { return index_; };
     void add_document(IndexID id, const IndexText &text);
 
   private:
     Index index_;
-    NgramStopWords stop_words_;
-    NgramLength min_length_;
-    NgramLength max_length_;
+    Config config_;
 };
 
 using IndexPath = std::filesystem::path;
