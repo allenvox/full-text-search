@@ -3,53 +3,60 @@
 #include <picosha2.h>
 #include <string>
 
-void IndexBuilder::add_document(IndexID id, const IndexText& text) {
+void IndexBuilder::add_document(IndexID id, const IndexText &text) {
     index_.docs.insert({id, text});
     NgramParser parser;
     NgramVec ngrams = parser.parse(text, stop_words_, min_length_, max_length_);
-    for(const auto& ngram : ngrams) {
+    for (const auto &ngram : ngrams) {
         index_.entries[ngram.text].push_back({id, ngram.pos});
     }
 }
 
-IndexHash term_to_hash(const IndexTerm& term) {
+IndexHash indexer::term_to_hash(const IndexTerm &term) {
     return picosha2::hash256_hex_string(term).substr(0, 6);
 }
 
-void throw_index_fs_error() {
+void indexer::throw_index_fs_error() {
     throw std::runtime_error("Can't create index file");
 }
 
-void create_index_directories(const IndexPath& path) {
+void indexer::create_index_directories(const IndexPath &path) {
     std::filesystem::create_directories(path / "index" / "docs");
     std::filesystem::create_directories(path / "index" / "entries");
     if (!std::filesystem::exists(path / "index")) {
-        throw_index_fs_error();
+        indexer::throw_index_fs_error();
     }
 }
 
-void write_docs(const IndexPath& path, const IndexDocuments& docs) {
-    for (const auto& [id, text] : docs) {
+void indexer::write_docs(const IndexPath &path, const IndexDocuments &docs) {
+    for (const auto &[id, text] : docs) {
         std::ofstream out_file(path / "index" / "docs" / std::to_string(id));
         if (!out_file.is_open()) {
-            throw_index_fs_error();
+            indexer::throw_index_fs_error();
         }
         out_file << text << '\n';
         out_file.close();
     }
 }
 
-IndexText convert_to_entry_output(const IndexTerm& term, const std::vector<IndexDocToPos>& doc_to_pos_vec) {
+IndexText indexer::convert_to_entry_output(
+    const IndexTerm &term, const std::vector<IndexDocToPos> &doc_to_pos_vec) {
     IndexText output(term + ' ' + std::to_string(doc_to_pos_vec.size()) + ' ');
     std::vector<IndexID> already_outputed;
-    for (const auto& doc_to_pos1 : doc_to_pos_vec) {
-        const auto& id = doc_to_pos1.doc_id;
-        if(std::count(already_outputed.begin(), already_outputed.end(), id) == 1) {
+    for (const auto &doc_to_pos1 : doc_to_pos_vec) {
+        const auto &id = doc_to_pos1.doc_id;
+        if (std::count(already_outputed.begin(), already_outputed.end(), id) ==
+            1) {
             continue;
         }
-        output.append(std::to_string(id) + ' ' + std::to_string(std::count_if(doc_to_pos_vec.begin(), doc_to_pos_vec.end(), [&](const IndexDocToPos& s) { return s.doc_id == id; }) + ' '));
-        for(const auto& doc_to_pos2 : doc_to_pos_vec) {
-            if(doc_to_pos2.doc_id == id) {
+        output.append(
+            std::to_string(id) + ' ' +
+            std::to_string(std::count_if(
+                doc_to_pos_vec.begin(), doc_to_pos_vec.end(),
+                [&](const IndexDocToPos &s) { return s.doc_id == id; })) +
+            ' ');
+        for (const auto &doc_to_pos2 : doc_to_pos_vec) {
+            if (doc_to_pos2.doc_id == id) {
                 output.append(std::to_string(doc_to_pos2.pos) + ' ');
             }
         }
@@ -59,11 +66,13 @@ IndexText convert_to_entry_output(const IndexTerm& term, const std::vector<Index
     return output;
 }
 
-void write_entries(const IndexPath& path, const IndexEntries& entries) {
-    for (const auto& [term, doc_to_pos_vec] : entries) {
-        std::ofstream out_file(path / "index" / "entries" / term_to_hash(term));
+void indexer::write_entries(const IndexPath &path,
+                            const IndexEntries &entries) {
+    for (const auto &[term, doc_to_pos_vec] : entries) {
+        std::ofstream out_file(path / "index" / "entries" /
+                               indexer::term_to_hash(term));
         if (!out_file.is_open()) {
-            throw_index_fs_error();
+            indexer::throw_index_fs_error();
         }
         out_file << convert_to_entry_output(term, doc_to_pos_vec);
         out_file.close();
@@ -71,7 +80,7 @@ void write_entries(const IndexPath& path, const IndexEntries& entries) {
 }
 
 void TextIndexWriter::write(IndexPath path, Index index) const {
-    create_index_directories(path);
-    write_docs(path, index.docs);
-    write_entries(path, index.entries);
+    indexer::create_index_directories(path);
+    indexer::write_docs(path, index.docs);
+    indexer::write_entries(path, index.entries);
 }
