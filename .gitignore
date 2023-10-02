@@ -1,5 +1,8 @@
-### Project ###
+### build directory ###
 build
+
+### JetBrains IDE ###
+.idea
 
 ### macOS ###
 *.dSYM
