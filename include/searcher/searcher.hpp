@@ -24,16 +24,18 @@ class IndexAccessor {
 
 class TextIndexAccessor : public IndexAccessor {
   public:
+    TextIndexAccessor(Config config, IndexPath path) : config_(config), path_(path){};
     Config config() const;
     TermInfos get_term_infos(const IndexTerm& term) const;
     IndexText load_document(IndexID doc_id) const;
     DocsCount total_docs() const;
   private:
+    Config config_;
     IndexPath path_;
 };
 
 namespace searcher {
 
-Results search(const SearcherQuery& query, const TextIndexAccessor& ia);
+Results search(const SearcherQuery& query, const TextIndexAccessor& ia) const;
 
 } // namespace searcher
