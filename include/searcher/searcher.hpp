@@ -17,7 +17,7 @@ using DocsCount = std::size_t;
 class IndexAccessor {
   public:
     virtual Config config() const = 0;
-    virtual TermInfos get_term_infos(IndexTerm term) const = 0;
+    virtual TermInfos get_term_infos(const IndexTerm& term) const = 0;
     virtual IndexText load_document(IndexID doc_id) const = 0;
     virtual DocsCount total_docs() const = 0;
 };
@@ -25,7 +25,7 @@ class IndexAccessor {
 class TextIndexAccessor : public IndexAccessor {
   public:
     Config config() const;
-    TermInfos get_term_infos(IndexTerm term) const;
+    TermInfos get_term_infos(const IndexTerm& term) const;
     IndexText load_document(IndexID doc_id) const;
     DocsCount total_docs() const;
   private:
@@ -34,6 +34,6 @@ class TextIndexAccessor : public IndexAccessor {
 
 namespace searcher {
 
-Results search(SearcherQuery query, IndexAccessor *ia);
+Results search(const SearcherQuery& query, const TextIndexAccessor& ia);
 
 } // namespace searcher
