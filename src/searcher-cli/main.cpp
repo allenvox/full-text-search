@@ -9,10 +9,14 @@ std::string get_user_input(const std::string &message) {
 }
 
 int main() {
-    const std::string idx_path = get_user_input("Enter input index path:");
+    std::string idx_path = get_user_input("Enter input index path:");
+    if (idx_path.empty()) {
+        idx_path = "build";
+    }
     const std::filesystem::path path = idx_path;
     const std::string query = get_user_input("Enter search query:");
-    const TextIndexAccessor indexAccessor({{"the"}, 3, 6}, path);
+    const TextIndexAccessor indexAccessor({{"the", "and", "of", "on"}, 3, 6},
+                                          path);
     Results results = searcher::search(query, indexAccessor);
     std::cout << "id\tscore\ttext\n";
     for (auto &result : results) {
