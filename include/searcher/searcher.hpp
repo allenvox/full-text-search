@@ -36,6 +36,6 @@ class TextIndexAccessor : public IndexAccessor {
 
 namespace searcher {
 
-Results search(const SearcherQuery& query, const TextIndexAccessor& ia) const;
+Results search(const SearcherQuery& query, const TextIndexAccessor& ia);
 
 } // namespace searcher
