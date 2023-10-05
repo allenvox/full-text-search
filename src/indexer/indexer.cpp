@@ -6,8 +6,8 @@
 void IndexBuilder::add_document(IndexID id, const IndexText &text) {
     index_.docs.insert({id, text});
     const NgramParser parser;
-    const NgramVec ngrams =
-        parser.parse(text, config_.stop_words, config_.min_length, config_.max_length);
+    const NgramVec ngrams = parser.parse(
+        text, config_.stop_words, config_.min_length, config_.max_length);
     for (const auto &ngram : ngrams) {
         index_.entries[ngram.text].push_back({id, ngram.pos});
     }
