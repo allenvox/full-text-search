@@ -18,6 +18,7 @@ target_link_libraries(
   ${target_name}
   PRIVATE
     indexer
+    common
 )
 
 set(test_name searcher.test)
