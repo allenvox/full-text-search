@@ -2,7 +2,8 @@ set(target_name common)
 
 add_library(${target_name} STATIC
   ${PROJECT_SOURCE_DIR}/include/${target_name}/${target_name}.hpp
-  common.cpp)
+  common.cpp
+)
 
 include(CompileOptions)
 set_compile_options(${target_name})
