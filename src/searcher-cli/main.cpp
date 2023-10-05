@@ -9,6 +9,9 @@ std::string get_user_input(const std::string &message) {
 }
 
 int main() {
+    std::cout.setf(std::ios::fixed);
+    std::cout.precision(4);
+
     std::string idx_path = get_user_input("Enter input index path:");
     if (idx_path.empty()) {
         idx_path = "build";
