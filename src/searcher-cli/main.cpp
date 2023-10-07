@@ -22,7 +22,7 @@ int main() {
                                         path);
   const Results results = searcher::search(query, indexAccessor);
   std::cout << "id\tscore\ttext\n";
-  for (auto &result : results) {
+  for (const auto &result : results) {
     const IndexID id = result.doc_id;
     std::cout << id << '\t' << result.score << '\t'
               << indexAccessor.load_document(id) << '\n';
