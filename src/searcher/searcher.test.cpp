@@ -1,5 +1,5 @@
-#include <fstream>
 #include <gtest/gtest.h>
+#include <fstream>
 #include <searcher/searcher.hpp>
 
 IndexPath testPath = "build/test";
@@ -12,7 +12,7 @@ SearcherQuery testSearcherQuery = "hi";
 
 TEST(SearcherTest, GetConfig) {
   const TextIndexAccessor indexAccessor(testConfig, testPath);
-  Config cfg = indexAccessor.config();
+  const Config cfg = indexAccessor.config();
   EXPECT_EQ(cfg.min_length, testConfig.min_length);
   EXPECT_EQ(cfg.max_length, testConfig.max_length);
 }

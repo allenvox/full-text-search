@@ -20,10 +20,10 @@ int main() {
   const std::string query = get_user_input("Enter search query:");
   const TextIndexAccessor indexAccessor({{"the", "and", "of", "on"}, 3, 6},
                                         path);
-  Results results = searcher::search(query, indexAccessor);
+  const Results results = searcher::search(query, indexAccessor);
   std::cout << "id\tscore\ttext\n";
   for (auto &result : results) {
-    IndexID id = result.doc_id;
+    const IndexID id = result.doc_id;
     std::cout << id << '\t' << result.score << '\t'
               << indexAccessor.load_document(id) << '\n';
   }
