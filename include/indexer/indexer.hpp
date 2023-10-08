@@ -12,8 +12,8 @@ using IndexDocuments = std::unordered_map<IndexID, IndexText>;
 using IndexIdx = std::size_t;
 
 struct IndexDocToPos {
-    IndexID doc_id;
-    IndexIdx pos;
+  IndexID doc_id;
+  IndexIdx pos;
 };
 using IndexDocToPos = struct IndexDocToPos;
 using IndexHash = std::string;
@@ -21,34 +21,34 @@ using IndexTerm = std::string;
 using IndexEntries = std::unordered_map<IndexTerm, std::vector<IndexDocToPos>>;
 
 class Index {
-  public:
-    IndexDocuments docs;
-    IndexEntries entries;
+public:
+  IndexDocuments docs;
+  IndexEntries entries;
 };
 
 class IndexBuilder {
-  public:
-    IndexBuilder(NgramStopWords stop_words, NgramLength min_length,
-                 NgramLength max_length)
-        : config_({std::move(stop_words), min_length, max_length}){};
-    Index index() const { return index_; };
-    void add_document(IndexID id, const IndexText &text);
+public:
+  IndexBuilder(NgramStopWords stop_words, NgramLength min_length,
+               NgramLength max_length)
+      : config_({std::move(stop_words), min_length, max_length}){};
+  Index index() const { return index_; };
+  void add_document(IndexID id, const IndexText &text);
 
-  private:
-    Index index_;
-    Config config_;
+private:
+  Index index_;
+  Config config_;
 };
 
 using IndexPath = std::filesystem::path;
 
 class IndexWriter {
-  public:
-    virtual void write(IndexPath path, Index index) const = 0;
+public:
+  virtual void write(IndexPath path, Index index) const = 0;
 };
 
 class TextIndexWriter : public IndexWriter {
-  public:
-    void write(IndexPath path, Index index) const;
+public:
+  void write(IndexPath path, Index index) const;
 };
 
 namespace indexer {
