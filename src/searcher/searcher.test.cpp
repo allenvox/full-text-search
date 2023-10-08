@@ -1,5 +1,6 @@
-#include <fstream>
 #include <gtest/gtest.h>
+
+#include <fstream>
 #include <searcher/searcher.hpp>
 
 IndexPath testPath = "build/test";
