@@ -49,15 +49,10 @@ DocsCount TextIndexAccessor::total_docs() const {
   DocsCount c = 0;
   for (const auto &entry :
        std::filesystem::directory_iterator(path_ / "index" / "docs")) {
-    if (entry.path() != "") {
-      ++c;
-    }
+    (void)entry;
+    ++c;
   }
   return c;
-}
-
-bool compare_desc_by_score(const Result &a, const Result &b) {
-  return a.score > b.score;
 }
 
 Results searcher::search(const SearcherQuery &query,
@@ -89,6 +84,9 @@ Results searcher::search(const SearcherQuery &query,
   for (auto &score : scores) {
     results.push_back({score.first, score.second});
   }
+  auto compare_desc_by_score = [](const Result &a, const Result &b) {
+    return a.score > b.score;
+  };
   std::sort(results.begin(), results.end(), compare_desc_by_score);
   return results;
 }
