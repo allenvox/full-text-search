@@ -1,8 +1,8 @@
-set(target_name common)
+set(target_name searcher)
 
 add_library(${target_name} STATIC
   ${PROJECT_SOURCE_DIR}/include/${target_name}/${target_name}.hpp
-  common.cpp
+  searcher.cpp
 )
 
 include(CompileOptions)
@@ -14,7 +14,14 @@ target_include_directories(
     ${PROJECT_SOURCE_DIR}/include
 )
 
-set(test_name common.test)
+target_link_libraries(
+  ${target_name}
+  PRIVATE
+    indexer
+    common
+)
+
+set(test_name searcher.test)
 
 add_executable(
   ${test_name}
@@ -32,7 +39,7 @@ target_include_directories(
 target_link_libraries(
   ${test_name}
   GTest::gtest_main
-  common
+  searcher
 )
 
 include(GoogleTest)
