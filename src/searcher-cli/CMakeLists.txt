@@ -9,5 +9,8 @@ target_sources(
 target_link_libraries(
   ${target_name}
   PRIVATE
+    cxxopts
+    driver
+    indexer
     searcher
 )
