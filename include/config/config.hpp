@@ -9,7 +9,7 @@ struct Config {
 };
 using Config = struct Config;
 
-const Config DEFAULT_CONFIG = {{"and", "are", "but", "for", "into", "not",
+Config DEFAULT_CONFIG = {{"and", "are", "but", "for", "into", "not",
                                 "such", "that", "the", "their", "then", "there",
                                 "these", "they", "this", "was", "will", "with"},
                                3,
