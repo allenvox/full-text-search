@@ -2,9 +2,7 @@
 
 #include <driver/driver.hpp>
 
-TEST(DriverTest, Trivial) {
-  EXPECT_EQ(1, 1);
-}
+TEST(DriverTest, Trivial) { EXPECT_EQ(1, 1); }
 
 int main(int argc, char *argv[]) {
   testing::InitGoogleTest(&argc, argv);

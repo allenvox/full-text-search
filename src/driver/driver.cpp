@@ -8,28 +8,29 @@
 
 namespace driver {
 
-void check_if_exists(const IndexPath& path) {
+void check_if_exists(const IndexPath &path) {
   if (!std::filesystem::exists(path)) {
-    std::string err = "error: " + static_cast<std::string>(path) + " doesn't exist\n";
+    std::string err =
+        "error: " + static_cast<std::string>(path) + " doesn't exist\n";
     throw std::runtime_error(err);
   }
 }
 
-rapidcsv::Document get_csv(const IndexPath& path) {
+rapidcsv::Document get_csv(const IndexPath &path) {
   rapidcsv::Document doc(path);
   return doc;
 }
 
-void remove_unneeded_cols(rapidcsv::Document& csv) {
-  for(std::size_t i = 2; i < csv.GetColumnCount(); ++i) {
+void remove_unneeded_cols(rapidcsv::Document &csv) {
+  for (std::size_t i = 2; i < csv.GetColumnCount(); ++i) {
     csv.RemoveColumn(i);
   }
 }
 
-Index generate_index(rapidcsv::Document& csv, Config& cfg) {
+Index generate_index(rapidcsv::Document &csv, Config &cfg) {
   IndexBuilder indexBuilder(cfg);
   remove_unneeded_cols(csv);
-  for(std::size_t i = 1; i < csv.GetRowCount(); ++i) {
+  for (std::size_t i = 1; i < csv.GetRowCount(); ++i) {
     IndexID id = csv.GetCell<IndexID>(0, i);
     IndexText txt = csv.GetCell<IndexText>(1, i);
     indexBuilder.add_document(id, txt);
@@ -37,7 +38,8 @@ Index generate_index(rapidcsv::Document& csv, Config& cfg) {
   return indexBuilder.index();
 }
 
-void write_index(const IndexPath &path, const Index &idx, const IndexWriter &iw) {
+void write_index(const IndexPath &path, const Index &idx,
+                 const IndexWriter &iw) {
   iw.write(path, idx);
 }
 

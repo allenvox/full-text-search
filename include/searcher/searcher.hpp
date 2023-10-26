@@ -24,7 +24,7 @@ public:
 
 class TextIndexAccessor : public IndexAccessor {
 public:
-  TextIndexAccessor(Config config, IndexPath path)
+  TextIndexAccessor(Config &config = DEFAULT_CONFIG, const IndexPath &path)
       : config_(std::move(config)), path_(std::move(path)){};
   Config config() const;
   TermInfos get_term_infos(const IndexTerm &term) const;

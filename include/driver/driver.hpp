@@ -14,6 +14,7 @@ IndexDocuments get_docs(const rapidcsv::Document &csv,
                         Config &cfg = DEFAULT_CONFIG);
 void remove_unneeded_cols(rapidcsv::Document &csv);
 Index generate_index(rapidcsv::Document &csv, Config &cfg);
-void write_index(const IndexPath &path, const Index &idx, const IndexWriter &iw);
+void write_index(const IndexPath &path, const Index &idx,
+                 const IndexWriter &iw);
 
 } // namespace driver
