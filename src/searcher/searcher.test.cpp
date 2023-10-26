@@ -12,7 +12,7 @@ DocsCount testDocsCount = 2;
 SearcherQuery testSearcherQuery = "hi";
 
 TEST(SearcherTest, GetConfig) {
-  const TextIndexAccessor indexAccessor(testConfig, testPath);
+  const TextIndexAccessor indexAccessor(testPath, testConfig);
   const Config cfg = indexAccessor.config();
   EXPECT_EQ(cfg.min_length, testConfig.min_length);
   EXPECT_EQ(cfg.max_length, testConfig.max_length);
@@ -26,24 +26,24 @@ TEST(SearcherTest, GetTermInfos) {
   const Index index = indexBuilder.index();
   const TextIndexWriter writer;
   writer.write(testPath, index);
-  const TextIndexAccessor indexAccessor(testConfig, testPath);
+  const TextIndexAccessor indexAccessor(testPath, testConfig);
   const TermInfos termInfos = indexAccessor.get_term_infos(testTerm);
   EXPECT_EQ(testTermInfos, termInfos);
 }
 
 TEST(SearcherTest, LoadDocument) {
-  const TextIndexAccessor indexAccessor(testConfig, testPath);
+  const TextIndexAccessor indexAccessor(testPath, testConfig);
   const IndexText docText = indexAccessor.load_document(testID);
   EXPECT_EQ(docText, testTerm);
 }
 
 TEST(SearcherTest, TotalDocs) {
-  const TextIndexAccessor indexAccessor(testConfig, testPath);
+  const TextIndexAccessor indexAccessor(testPath, testConfig);
   EXPECT_EQ(indexAccessor.total_docs(), testDocsCount);
 }
 
 TEST(SearcherTest, Search) {
-  const TextIndexAccessor indexAccessor(testConfig, testPath);
+  const TextIndexAccessor indexAccessor(testPath, testConfig);
   Results results = searcher::search(testSearcherQuery, indexAccessor);
   EXPECT_EQ(results[0].doc_id, testID);
 }
