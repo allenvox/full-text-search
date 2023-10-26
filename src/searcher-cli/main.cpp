@@ -43,9 +43,7 @@ int main(int argc, char **argv) {
     query = get_user_input("Enter " + query_description + ':');
   }
 
-  const TextIndexAccessor indexAccessor({{"the", "and", "of", "on"}, 3, 7},
-                                        index_path);
-
+  const TextIndexAccessor indexAccessor(index_path);
   const Results results = searcher::search(query, indexAccessor);
   std::cout << "id\tscore\ttext\n";
   for (const auto &result : results) {
