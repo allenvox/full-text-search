@@ -1,6 +1,6 @@
-#include <fts/fts.hpp>
-
 #include <gtest/gtest.h>
+
+#include <fts/fts.hpp>
 
 TEST(SumTest, Trivial) { EXPECT_EQ(3, fts::sum(1, 2)); }
 
