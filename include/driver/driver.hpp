@@ -13,7 +13,7 @@ rapidcsv::Document get_csv(const IndexPath &path);
 IndexDocuments get_docs(const rapidcsv::Document &csv,
                         Config &cfg = DEFAULT_CONFIG);
 void remove_unneeded_cols(rapidcsv::Document &csv);
-Index generate_index(rapidcsv::Document &csv, Config &cfg);
+Index generate_index(IndexPath &csv_path, Config &cfg = DEFAULT_CONFIG);
 void write_index(const IndexPath &path, const Index &idx,
                  const IndexWriter &iw);
 
