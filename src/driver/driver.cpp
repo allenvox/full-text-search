@@ -27,7 +27,8 @@ void remove_unneeded_cols(rapidcsv::Document &csv) {
   }
 }
 
-Index generate_index(rapidcsv::Document &csv, Config &cfg) {
+Index generate_index(IndexPath &csv_path, Config &cfg) {
+  rapidcsv::Document csv(csv_path);
   IndexBuilder indexBuilder(cfg);
   remove_unneeded_cols(csv);
   for (std::size_t i = 1; i < csv.GetRowCount(); ++i) {
