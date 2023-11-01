@@ -14,6 +14,7 @@ target_link_libraries(
   ${target_name}
   PRIVATE
     common
+    config
 )
 
 set(test_name indexer.test)

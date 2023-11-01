@@ -16,6 +16,7 @@ target_link_libraries(
   PRIVATE
     indexer
     searcher
+    config
 )
 
 set(test_name driver.test)
