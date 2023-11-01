@@ -30,7 +30,7 @@ Index generate_index(IndexPath &csv_path, Config &cfg) {
   rapidcsv::Document csv(csv_path);
   IndexBuilder indexBuilder(cfg);
   remove_unneeded_cols(csv);
-  for (std::size_t i = 1; i < csv.GetRowCount(); ++i) {
+  for (std::size_t i = 0; i < csv.GetRowCount(); ++i) {
     auto id = csv.GetCell<IndexID>(0, i);
     auto txt = csv.GetCell<IndexText>(1, i);
     indexBuilder.add_document(id, txt);
