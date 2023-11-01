@@ -9,7 +9,7 @@ namespace driver {
 
 void check_if_exists(const IndexPath &path) {
   if (!std::filesystem::exists(path)) {
-    std::string err =
+    const std::string err =
         "error: " + static_cast<std::string>(path) + " doesn't exist\n";
     throw std::runtime_error(err);
   }
