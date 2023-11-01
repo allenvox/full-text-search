@@ -45,11 +45,20 @@ int main(int argc, char **argv) {
 
   const TextIndexAccessor indexAccessor(index_path);
   const Results results = searcher::search(query, indexAccessor);
+  std::size_t outputted = 0;
   std::cout << "id\tscore\ttext\n";
   for (const auto &result : results) {
+    if (outputted == 5) {
+      std::cout << "press Q to exit or any other key to output all results ";
+      auto c = getchar();
+      if (tolower(c) == 'q') {
+        break;
+      }
+    }
     const IndexID id = result.doc_id;
     std::cout << id << '\t' << result.score << '\t'
               << indexAccessor.load_document(id) << '\n';
+    outputted++;
   }
   return 0;
 }
