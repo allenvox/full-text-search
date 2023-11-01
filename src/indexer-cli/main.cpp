@@ -43,6 +43,6 @@ int main(int argc, char **argv) {
 
   const Index idx = driver::generate_index(csv_path);
   const TextIndexWriter writer;
-  driver::write_index(index_path, idx, writer);
+  writer.write(index_path, idx);
   return 0;
 }
