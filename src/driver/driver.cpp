@@ -4,7 +4,6 @@
 #include <indexer/indexer.hpp>
 
 #include <iostream>
-#include <unordered_map>
 
 namespace driver {
 
