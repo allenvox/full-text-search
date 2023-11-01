@@ -22,7 +22,10 @@ Checks: >
   -google-runtime-int,
   -cppcoreguidelines-init-variables,
   -bugprone-exception-escape,
-  -readability-redundant-string-init
+  -readability-redundant-string-init,
+  -readability-function-cognitive-complexity,
+  -cppcoreguidelines-avoid-goto,
+  -hicpp-avoid-goto
 WarningsAsErrors: '*'
 HeaderFilterRegex: 'include/(fts)'
 AnalyzeTemporaryDtors: false
