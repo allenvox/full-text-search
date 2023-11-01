@@ -39,9 +39,4 @@ Index generate_index(IndexPath &csv_path, Config &cfg) {
   return indexBuilder.index();
 }
 
-void write_index(const IndexPath &path, const Index &idx,
-                 const IndexWriter &iw) {
-  iw.write(path, idx);
-}
-
 } // namespace driver
