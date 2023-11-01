@@ -1,7 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <fstream>
 #include <searcher/searcher.hpp>
+
+#include <fstream>
 
 IndexPath testPath = "build/test";
 IndexID testID = 363;
