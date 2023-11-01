@@ -32,8 +32,8 @@ Index generate_index(IndexPath &csv_path, Config &cfg) {
   IndexBuilder indexBuilder(cfg);
   remove_unneeded_cols(csv);
   for (std::size_t i = 1; i < csv.GetRowCount(); ++i) {
-    IndexID id = csv.GetCell<IndexID>(0, i);
-    IndexText txt = csv.GetCell<IndexText>(1, i);
+    auto id = csv.GetCell<IndexID>(0, i);
+    auto txt = csv.GetCell<IndexText>(1, i);
     indexBuilder.add_document(id, txt);
   }
   return indexBuilder.index();
