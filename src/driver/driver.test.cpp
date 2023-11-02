@@ -18,15 +18,13 @@ rapidcsv::Document testDoc() {
 }
 
 TEST(DriverTest, CheckExist) {
-  rapidcsv::Document doc = testDoc();
-  doc.Save(testPath);
+  testDoc().Save(testPath);
   EXPECT_THROW(driver::check_if_exists(fakePath), std::runtime_error);
   EXPECT_NO_THROW(driver::check_if_exists(testPath));
 }
 
 TEST(DriverTest, GetCSV) {
-  rapidcsv::Document test = testDoc();
-  test.Save(testPath);
+  testDoc().Save(testPath);
   const rapidcsv::Document doc = driver::get_csv(testPath);
   EXPECT_EQ(doc.GetColumnCount(), 3);
 }
@@ -38,8 +36,7 @@ TEST(DriverTest, RemoveCols) {
 }
 
 TEST(DriverTest, GenerateIdx) {
-  rapidcsv::Document doc = testDoc();
-  doc.Save(testPath);
+  testDoc().Save(testPath);
   const Index index = driver::generate_index(testPath);
   for (auto [id, text] : index.docs) {
     std::cout << id << ' ' << text << '\n';
