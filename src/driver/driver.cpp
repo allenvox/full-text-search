@@ -20,10 +20,7 @@ rapidcsv::Document get_csv(const IndexPath &path) {
   return doc;
 }
 
-enum ColumnHeader {
-  ID_column,
-  Text_column
-};
+enum ColumnHeader { ID_column, Text_column };
 
 Index generate_index(IndexPath &csv_path, Config &cfg) {
   rapidcsv::Document csv(csv_path);
