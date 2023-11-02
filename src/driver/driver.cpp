@@ -23,7 +23,7 @@ rapidcsv::Document get_csv(const IndexPath &path) {
 enum ColumnHeader { ID_column, Text_column };
 
 Index generate_index(IndexPath &csv_path, Config &cfg) {
-  rapidcsv::Document csv(csv_path);
+  const rapidcsv::Document csv(csv_path);
   IndexBuilder indexBuilder(cfg);
   for (std::size_t i = 0; i < csv.GetRowCount(); ++i) {
     auto id = csv.GetCell<IndexID>(ID_column, i);
