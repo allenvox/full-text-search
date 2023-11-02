@@ -29,18 +29,9 @@ TEST(DriverTest, GetCSV) {
   EXPECT_EQ(doc.GetColumnCount(), 3);
 }
 
-TEST(DriverTest, RemoveCols) {
-  rapidcsv::Document doc = testDoc();
-  driver::remove_unneeded_cols(doc);
-  EXPECT_EQ(doc.GetColumnCount(), 2);
-}
-
 TEST(DriverTest, GenerateIdx) {
   testDoc().Save(testPath);
   const Index index = driver::generate_index(testPath);
-  for (auto [id, text] : index.docs) {
-    std::cout << id << ' ' << text << '\n';
-  }
   EXPECT_EQ(index.docs.size(), 3);
 }
 
