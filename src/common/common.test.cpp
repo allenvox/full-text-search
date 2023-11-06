@@ -1,6 +1,6 @@
-#include <common/common.hpp>
-
 #include <gtest/gtest.h>
+
+#include <common/common.hpp>
 
 TEST(ClearTextTest, Uppercase) {
   const NgramParser parser;

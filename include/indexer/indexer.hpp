@@ -31,6 +31,7 @@ public:
   IndexBuilder(NgramStopWords stop_words, NgramLength min_length,
                NgramLength max_length)
       : config_({std::move(stop_words), min_length, max_length}){};
+  IndexBuilder(Config &cfg = DEFAULT_CONFIG) : config_(std::move(cfg)){};
   Index index() const { return index_; };
   void add_document(IndexID id, const IndexText &text);
 

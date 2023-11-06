@@ -8,3 +8,5 @@ struct Config {
   NgramLength max_length;
 };
 using Config = struct Config;
+
+extern Config DEFAULT_CONFIG;

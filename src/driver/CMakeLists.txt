@@ -1,7 +1,7 @@
-set(target_name common)
+set(target_name driver)
 add_library(${target_name} STATIC
   ${PROJECT_SOURCE_DIR}/include/${target_name}/${target_name}.hpp
-  common.cpp
+  driver.cpp
 )
 set_compile_options(${target_name})
 target_include_directories(
@@ -9,8 +9,17 @@ target_include_directories(
   PUBLIC
     ${PROJECT_SOURCE_DIR}/include
 )
+target_link_libraries(
+  ${target_name}
+  PUBLIC
+    rapidcsv
+  PRIVATE
+    indexer
+    searcher
+    config
+)
 
-set(test_name common.test)
+set(test_name driver.test)
 add_executable(
   ${test_name}
   ${test_name}.cpp
@@ -24,7 +33,7 @@ target_include_directories(
 target_link_libraries(
   ${test_name}
   GTest::gtest_main
-  common
+  driver
 )
 
 include(GoogleTest)

@@ -1,6 +1,6 @@
-#include <indexer/indexer.hpp>
-
 #include <gtest/gtest.h>
+
+#include <indexer/indexer.hpp>
 
 #include <fstream>
 
