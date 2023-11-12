@@ -15,7 +15,7 @@ target_include_directories(
 )
 target_link_libraries(
         ${target_name}
-        PRIVATE
+        PUBLIC
         searcher
         indexer
 )
