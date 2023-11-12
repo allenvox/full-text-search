@@ -1,7 +1,6 @@
 #include <searcher-c/searcher-c.h>
 #include <searcher/searcher.hpp>
 
-#include <cstring>
 #include <stdexcept>
 
 // struct to hold the C++ TextIndexAccessor instance
