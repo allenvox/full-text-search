@@ -1,21 +1,24 @@
+#include <picosha2.h>
+
+#include <common/common.hpp>
+#include <searcher/searcher.hpp>
+
 #include <algorithm>
 #include <cmath>
-#include <common/common.hpp>
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <picosha2.h>
-#include <searcher/searcher.hpp>
 #include <string>
 
 constexpr auto IDX_DOESNT_CONTAIN = "!!";
 
 Config TextIndexAccessor::config() const { return config_; }
 
-TermInfos TextIndexAccessor::get_term_infos(const IndexTerm &term) const {
-  const IndexHash hash = picosha2::hash256_hex_string(term).substr(0, 6);
-  const IndexPath fullPath = path_ / "index" / "entries" / hash;
+TermInfos TextIndexAccessor::get_term_infos(const std::string &term) const {
+  const std::string hash = picosha2::hash256_hex_string(term).substr(0, 6);
+  const std::filesystem::path fullPath = path_ / "index" / "entries" / hash;
   if (!std::filesystem::exists(fullPath)) {
     return IDX_DOESNT_CONTAIN;
   }
@@ -31,13 +34,13 @@ TermInfos TextIndexAccessor::get_term_infos(const IndexTerm &term) const {
   return termInfos;
 }
 
-IndexText TextIndexAccessor::load_document(IndexID doc_id) const {
+std::string TextIndexAccessor::load_document(std::size_t doc_id) const {
   const std::string doc_name = std::to_string(doc_id);
   std::ifstream docFile(path_ / "index" / "docs" / doc_name);
   if (!docFile.is_open()) {
     throw std::runtime_error("Can't open document file " + doc_name);
   }
-  IndexText docText("");
+  std::string docText("");
   std::string line;
   while (std::getline(docFile, line)) {
     docText += line;
@@ -61,7 +64,7 @@ Results searcher::search(const SearcherQuery &query,
   const Config cfg = ia.config();
   const NgramVec parsed =
       parser.parse(query, cfg.stop_words, cfg.min_length, cfg.max_length);
-  std::map<IndexID, double> scores;
+  std::map<std::size_t, double> scores;
   for (const auto &ngram : parsed) {
     const TermInfos termInfos = ia.get_term_infos(ngram.text);
     if (termInfos == IDX_DOESNT_CONTAIN) {

@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 
+#include <indexer/indexer.hpp>
 #include <searcher/searcher.hpp>
 
 #include <fstream>
 
-IndexPath testPath = "build/test";
-IndexID testID = 363;
-IndexTerm testTerm = "hi";
+std::filesystem::path testPath = "build/test";
+std::size_t testID = 363;
+std::string testTerm = "hi";
 TermInfos testTermInfos = "hi 1 363 1 0 ";
 Config testConfig = {{}, 1, 3};
 DocsCount testDocsCount = 2;
@@ -34,7 +35,7 @@ TEST(SearcherTest, GetTermInfos) {
 
 TEST(SearcherTest, LoadDocument) {
   const TextIndexAccessor indexAccessor(testPath, testConfig);
-  const IndexText docText = indexAccessor.load_document(testID);
+  const std::string docText = indexAccessor.load_document(testID);
   EXPECT_EQ(docText, testTerm);
 }
 
