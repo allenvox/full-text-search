@@ -8,11 +8,11 @@ target_include_directories(
   ${target_name}
   PUBLIC
     ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_BINARY_DIR}/_deps/picosha2-src
 )
 target_link_libraries(
   ${target_name}
   PRIVATE
-    indexer
     common
 )
 
@@ -31,6 +31,7 @@ target_link_libraries(
   ${test_name}
   GTest::gtest_main
   searcher
+  indexer
 )
 
 include(GoogleTest)
