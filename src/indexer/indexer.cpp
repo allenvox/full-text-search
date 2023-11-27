@@ -17,15 +17,14 @@ IndexHash indexer::term_to_hash(const IndexTerm &term) {
   return picosha2::hash256_hex_string(term).substr(0, 6);
 }
 
-void indexer::throw_index_fs_error() {
-  throw std::runtime_error("Can't create index file");
-}
-
 void indexer::create_index_directories(const IndexPath &path) {
-  std::filesystem::create_directories(path / "index" / "docs");
-  std::filesystem::create_directories(path / "index" / "entries");
-  if (!std::filesystem::exists(path / "index")) {
-    indexer::throw_index_fs_error();
+  std::filesystem::path base_path = path / "index";
+  std::filesystem::create_directories(base_path / "docs");
+  std::filesystem::create_directories(base_path / "entries");
+  if (!std::filesystem::exists(base_path) ||
+      !std::filesystem::exists(base_path / "docs") ||
+      !std::filesystem::exists(base_path / "entries")) {
+    throw std::runtime_error("Index folder doesn't exist");
   }
 }
 
@@ -33,7 +32,7 @@ void indexer::write_docs(const IndexPath &path, const IndexDocuments &docs) {
   for (const auto &[id, text] : docs) {
     std::ofstream out_file(path / "index" / "docs" / std::to_string(id));
     if (!out_file.is_open()) {
-      indexer::throw_index_fs_error();
+      throw std::runtime_error("Can't open document with id " + std::to_string(id));
     }
     out_file << text << '\n';
     out_file.close();
@@ -68,10 +67,10 @@ IndexText indexer::convert_to_entry_output(
 void indexer::write_entries(const IndexPath &path,
                             const IndexEntries &entries) {
   for (const auto &[term, doc_to_pos_vec] : entries) {
-    std::ofstream out_file(path / "index" / "entries" /
-                           indexer::term_to_hash(term));
+    std::string hash = indexer::term_to_hash(term);
+    std::ofstream out_file(path / "index" / "entries" / hash);
     if (!out_file.is_open()) {
-      indexer::throw_index_fs_error();
+      throw std::runtime_error("Can't open entry " + hash);
     }
     out_file << convert_to_entry_output(term, doc_to_pos_vec);
     out_file.close();
