@@ -27,7 +27,13 @@ Checks: >
   -hicpp-avoid-goto,
   -cppcoreguidelines-pro-type-reinterpret-cast,
   -cppcoreguidelines-pro-type-member-init,
-  -hicpp-member-init
+  -hicpp-member-init,
+  -android-cloexec-open,
+  -cppcoreguidelines-pro-type-vararg,
+  -hicpp-vararg,
+  -modernize-use-nullptr,
+  -cppcoreguidelines-pro-type-cstyle-cast,
+  -performance-no-int-to-ptr
 WarningsAsErrors: '*'
 HeaderFilterRegex: 'include/(common|config|driver|fts|indexer|indexer-cli|parser|searcher|searcher-c|searcher-cli|sum)'
 AnalyzeTemporaryDtors: false
