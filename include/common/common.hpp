@@ -32,17 +32,17 @@ public:
   NgramText clear_text(const NgramText &source) const;
 
   NgramWords split_in_words(const NgramText &text,
-                            const char separator = ' ') const;
+                            char separator = ' ') const;
 
   NgramWords remove_stop_words(const NgramWords &words,
                                const NgramStopWords &stop_words) const;
 
   NgramVec generate_ngrams(const NgramWords &words,
                            const NgramStopWords &stop_words,
-                           const NgramLength ngram_min_length,
-                           const NgramLength ngram_max_length) const;
+                           NgramLength ngram_min_length,
+                           NgramLength ngram_max_length) const;
 
   NgramVec parse(const NgramText &text, const NgramStopWords &stop_words,
-                 const NgramLength ngram_min_length,
-                 const NgramLength ngram_max_length) const override;
+                 NgramLength ngram_min_length,
+                 NgramLength ngram_max_length) const override;
 };
