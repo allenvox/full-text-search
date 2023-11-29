@@ -11,7 +11,7 @@ struct IndexAccessorWrapper {
 void *initialize_searcher(const char *index_path) {
   // create a TextIndexAccessor instance and store it in the wrapper
   IndexAccessorWrapper *wrapper = new IndexAccessorWrapper;
-  wrapper->accessor = new TextIndexAccessor(index_path);
+  wrapper->accessor = new TextIndexAccessor((std::filesystem::path &)index_path);
   return reinterpret_cast<void *>(wrapper);
 }
 
