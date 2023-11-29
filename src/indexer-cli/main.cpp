@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
   driver::check_if_exists(index_path);
 
   const Index idx = driver::generate_index(csv_path);
-  const TextIndexWriter writer;
+  const BinaryIndexWriter writer;
   writer.write(index_path, idx);
   return 0;
 }
