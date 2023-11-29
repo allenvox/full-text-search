@@ -93,10 +93,10 @@ uint32_t indexer::get_offset(const uint32_t id, const IdToOffset &id_to_offset) 
 }
 
 void indexer::push_u32_to_u8(const uint32_t val, BytesVec &vec) {
-  vec.push_back(val & 0xFF);
-  vec.push_back((val >> 8) & 0xFF);
-  vec.push_back((val >> 16) & 0xFF);
-  vec.push_back((val >> 24) & 0xFF);
+  vec.push_back(val & 0xFFU);
+  vec.push_back((val >> 8U) & 0xFFU);
+  vec.push_back((val >> 16U) & 0xFFU);
+  vec.push_back((val >> 24U) & 0xFFU);
 }
 
 BytesVec indexer::serialize_string(const std::string &str) {
@@ -108,16 +108,16 @@ BytesVec indexer::serialize_string(const std::string &str) {
   return serialized;
 }
 
-BytesVec indexer::serialize_docs(const std::vector<std::string> &titles,
+BytesVec indexer::serialize_docs(const IndexDocuments &docs,
                                  IdToOffset &id_to_offset) {
   BytesVec serialized_docs;
   uint32_t current_offset = 0;
-  uint32_t titles_count = static_cast<uint32_t>(titles.size());
+  auto docs_count = static_cast<uint32_t>(docs.size());
   // write docs (titles) count in first 4 bytes
-  push_u32_to_u8(titles_count, serialized_docs);
-  for (const auto& title : titles) {
+  push_u32_to_u8(docs_count, serialized_docs);
+  for (const auto& [id, title] : docs) {
     // get offset of doc
-    id_to_offset[static_cast<uint32_t>(id_to_offset.size())] = current_offset;
+    id_to_offset[id] = current_offset;
     BytesVec serialized_title = serialize_string(title);
     // add serialized title bytes to docs
     serialized_docs.insert(serialized_docs.end(),
@@ -129,34 +129,41 @@ BytesVec indexer::serialize_docs(const std::vector<std::string> &titles,
   return serialized_docs;
 }
 
-BytesVec indexer::serialize_entries(const std::vector<IndexDocToPos> &entries,
-                                    const IdToOffset &id_to_offset) {
-  // filling occurrences [ doc_offset: { pos_count, pos1, pos2... } ]
-  std::unordered_map<uint32_t, std::vector<uint32_t>> occurrences;
-  for (const auto& entry : entries) {
-    uint32_t pos = entry.pos;
-    uint32_t offset = get_offset(entry.doc_id, id_to_offset);
-    auto occurrences_it = occurrences.find(offset);
-    auto entry_vec = occurrences_it->second;
-    if (occurrences_it == occurrences.end()) {
-      entry_vec = {1, pos};
-    } else {
-      entry_vec[0]++;
-      entry_vec.push_back(pos);
-    }
-  }
-
+BytesVec indexer::serialize_entries(const IndexEntries &entries,
+                                    const IdToOffset &id_to_offset,
+                                    TermToOffset &term_to_offset) {
   BytesVec serialized_entries;
-  // serialize count of docs where entry appears
-  uint32_t docs_count = occurrences.size();
-  push_u32_to_u8(docs_count, serialized_entries);
-  for (const auto& [offset, pos_vec] : occurrences) {
-    push_u32_to_u8(offset, serialized_entries); // serialize doc offset
-    // serialize pos_count
-    uint32_t pos_count = pos_vec[0];
-    push_u32_to_u8(pos_count, serialized_entries);
-    for (std::size_t i = 1; i < pos_vec.size(); ++i) { // serialize positions
-      push_u32_to_u8(pos_vec[i], serialized_entries);
+  for (const auto& [term, doc_to_pos] : entries) {
+    // filling occurrences for term [ doc_offset: { pos_count, pos1, pos2... } ]
+    std::unordered_map<uint32_t, std::vector<uint32_t>> occurrences;
+    for (const auto& entry : doc_to_pos) {
+      uint32_t pos = entry.pos;
+      uint32_t offset = get_offset(entry.doc_id, id_to_offset);
+      auto occurrences_it = occurrences.find(offset);
+      if (occurrences_it == occurrences.end()) {
+        occurrences[offset] = {1, pos};
+      } else {
+        occurrences[offset][0]++;
+        occurrences[offset].push_back(pos);
+      }
+    }
+    term_to_offset[term] = serialized_entries.size();
+
+    // serialize count of docs where entry appears
+    push_u32_to_u8(occurrences.size(), serialized_entries);
+
+    for (const auto& [doc_offset, pos_vec] : occurrences) {
+      // serialize doc offset
+      push_u32_to_u8(doc_offset, serialized_entries);
+
+      // serialize pos_count
+      uint32_t pos_count = pos_vec[0];
+      push_u32_to_u8(pos_count, serialized_entries);
+
+      // serialize positions
+      for (const auto& pos : pos_vec) {
+        push_u32_to_u8(pos, serialized_entries);
+      }
     }
   }
   return serialized_entries;
@@ -176,46 +183,111 @@ void indexer::insertWord(TrieNode* root, const std::string &word,
   node->entry_offset = entry_offset;
 }
 
-BytesVec indexer::serialize_dictionary(TrieNode* root,
-                                       uint32_t &next_entry_offset) {
-  std::vector<uint8_t> serialized_dictionary;
-  // for recursive serialization of trie
-  std::function<void(TrieNode*)> serializeTrie = [&](TrieNode* node) {
-    if (node == nullptr) {
-      return;
-    }
+BytesVec indexer::serialize_dictionary(const IndexEntries &entries, const TermToOffset &term_to_offset) {
+  auto* root = new TrieNode();
+  BytesVec serialized_dictionary;
+
+  // add all terms to trie
+  for (const auto& [term, doc_to_pos_vec] : entries) {
+    insertWord(root, term, term_to_offset.at(term));
+  }
+
+  // recursive serialization with offsets
+  std::function<void(TrieNode*)> serializeNode = [&](TrieNode* node) {
     // serialize children_count
-    uint32_t children_count = static_cast<uint32_t>(node->children.size());
-    push_u32_to_u8(children_count, serialized_dictionary);
-    // serialize children letters & its offsets
-    for (const auto& entry : node->children) {
-      char letter = entry.first;
-      TrieNode* child = entry.second;
-      uint32_t child_offset = next_entry_offset; // save current child offset
-      // serialize letter
+    auto childrenCount = static_cast<uint32_t>(node->children.size());
+    push_u32_to_u8(childrenCount, serialized_dictionary);
+
+    // serialize children nodes letters and their offsets
+    for (const auto& [letter, childNode] : node->children) {
       serialized_dictionary.push_back(static_cast<uint8_t>(letter));
-      // serialize current child offset
-      push_u32_to_u8(child_offset, serialized_dictionary);
-      serializeTrie(child); // recursively serialize child
+      uint32_t childOffset = childNode->entry_offset;
+      push_u32_to_u8(childOffset, serialized_dictionary);
     }
-    serialized_dictionary.push_back(node->is_leaf ? 1 : 0);
-    if (node->is_leaf) { // if leaf node - serialize entry_offset
-      push_u32_to_u8(node->entry_offset, serialized_dictionary);
+
+    // serialize is_leaf
+    uint8_t isLeaf = node->is_leaf ? 1 : 0;
+    serialized_dictionary.push_back(isLeaf);
+
+    if (node->is_leaf) {
+      // serialize entry_offset
+      uint32_t entryOffset = node->entry_offset;
+      push_u32_to_u8(entryOffset, serialized_dictionary);
+    }
+
+    for (const auto& [letter, childNode] : node->children) {
+      serializeNode(childNode);
     }
   };
-  serializeTrie(root); // start serialization from root
+
+  serializeNode(root); // start serialization from root
+  delete root; // delete trie after serialization
+
   return serialized_dictionary;
 }
 
-BytesVec indexer::serialize_header(const std::vector<std::vector<uint8_t>> &sections) {
+void indexer::change_offset(BytesVec &header, uint32_t pos, uint32_t val) {
+  header.at(pos) = val & 0xFFU;
+  header.at(pos + 1) = (val >> 8U) & 0xFFU;
+  header.at(pos + 2) = (val >> 16U) & 0xFFU;
+  header.at(pos + 3) = (val >> 24U) & 0xFFU;
+}
+
+BytesVec indexer::serialize_header(const BytesVec &dictionary,
+                                   const BytesVec &entries) {
   BytesVec serialized_header{4};
-  std::vector<std::string> names{"header", "dictionary", "entries", "docs"};
-  uint32_t current_offset = 0;
-  for (std::size_t i = 0; i < 4; ++i) {
-    BytesVec name = serialize_string(names[i]);
-    serialized_header.insert(serialized_header.end(), name.begin(), name.end());
-    push_u32_to_u8(static_cast<uint32_t>(current_offset), serialized_header);
-    current_offset += static_cast<uint32_t>(sections[i].size());
-  }
+  BytesVec hname = serialize_string("header");
+  serialized_header.insert(serialized_header.end(), hname.begin(), hname.end());
+  push_u32_to_u8(0, serialized_header);
+
+  BytesVec diname = serialize_string("dictionary");
+  serialized_header.insert(serialized_header.end(), diname.begin(), diname.end());
+  uint32_t dioffset = serialized_header.size();
+  push_u32_to_u8(0, serialized_header);
+
+  BytesVec ename = serialize_string("entries");
+  serialized_header.insert(serialized_header.end(), ename.begin(), ename.end());
+  uint32_t eoffset = serialized_header.size();
+  push_u32_to_u8(0, serialized_header);
+
+  BytesVec doname = serialize_string("docs");
+  serialized_header.insert(serialized_header.end(), doname.begin(), doname.end());
+  uint32_t dooffset = serialized_header.size();
+  push_u32_to_u8(0, serialized_header);
+
+  uint32_t cur_offset = serialized_header.size();
+  change_offset(serialized_header, dioffset, cur_offset);
+  cur_offset += dictionary.size();
+  change_offset(serialized_header, eoffset, cur_offset);
+  cur_offset += entries.size();
+  change_offset(serialized_header, dooffset, cur_offset);
+
   return serialized_header;
+}
+
+void BinaryIndexWriter::write(IndexPath path, Index index) const {
+  indexer::IdToOffset id_to_offset;
+  indexer::TermToOffset term_to_offset;
+  std::vector<BytesVec> sections(4);
+
+  sections[3] = indexer::serialize_docs(index.docs, id_to_offset);
+  sections[2] = indexer::serialize_entries(index.entries, id_to_offset, term_to_offset);
+  sections[1] = indexer::serialize_dictionary(index.entries, term_to_offset);
+  sections[0] = indexer::serialize_header(sections[1], sections[2]);
+
+  std::ofstream out_file(path / "index.bin", std::ios::binary);
+  if (!out_file.is_open()) {
+    throw std::runtime_error("Failed to open the output file.");
+  }
+
+  try {
+    for (const auto& section : sections) {
+      out_file.write(reinterpret_cast<const char*>(section.data()),
+                     static_cast<std::streamsize>(section.size()));
+    }
+    out_file.close();
+  } catch (const std::exception& e) {
+    out_file.close();
+    throw e;
+  }
 }
