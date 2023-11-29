@@ -24,9 +24,12 @@ Checks: >
   -readability-redundant-string-init,
   -readability-function-cognitive-complexity,
   -cppcoreguidelines-avoid-goto,
-  -hicpp-avoid-goto
+  -hicpp-avoid-goto,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  -cppcoreguidelines-pro-type-member-init,
+  -hicpp-member-init
 WarningsAsErrors: '*'
-HeaderFilterRegex: 'include/(fts)'
+HeaderFilterRegex: 'include/(common|config|driver|fts|indexer|indexer-cli|parser|searcher|searcher-c|searcher-cli|sum)'
 AnalyzeTemporaryDtors: false
 FormatStyle:     none
 User:            allenvox
