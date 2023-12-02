@@ -29,7 +29,7 @@ public:
   explicit TextIndexAccessor(std::filesystem::path &path,
                              Config &config = DEFAULT_CONFIG)
       : config_(std::move(config)), path_(std::move(path)){};
-  Config config() const override;
+  Config config() const override { return config_; };
   TermInfos get_term_infos(const std::string &term) const override;
   std::string load_document(std::size_t doc_id) const override;
   DocsCount total_docs() const override;
@@ -69,9 +69,10 @@ private:
 
 class BinaryIndexAccessor : public IndexAccessor {
 public:
-  explicit BinaryIndexAccessor(std::filesystem::path &path);
+  explicit BinaryIndexAccessor(std::filesystem::path &path,
+                               Config &config = DEFAULT_CONFIG);
   void print_data() const;
-  Config config() const override;
+  Config config() const override { return config_; };
   TermInfos get_term_infos(const std::string &term) const override {
     return ea_->get_term_infos(term.size());
   };
@@ -84,6 +85,7 @@ public:
 
 private:
   uint32_t get_u32_from_u8s(uint32_t start, const std::vector<uint8_t> &bytes);
+  Config config_;
   std::vector<uint8_t> data_;
   std::size_t fsize_;
   DictionaryAccessor *dia_;
