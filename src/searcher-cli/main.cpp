@@ -28,22 +28,22 @@ int main(int argc, char **argv) {
     ("query", query_description, cxxopts::value<std::string>());
   // clang-format on
 
-  const auto result = options.parse(argc, argv);
+  const auto cliargs = options.parse(argc, argv);
 
-  if (result.count("index") == 1) {
-    index_path = result["index"].as<IndexPath>();
+  if (cliargs.count("index") == 1) {
+    index_path = cliargs["index"].as<IndexPath>();
   } else {
     index_path = get_user_input("Enter " + index_description + ':');
   }
   driver::check_if_exists(index_path);
 
-  if (result.count("query") == 1) {
-    query = result["query"].as<std::string>();
+  if (cliargs.count("query") == 1) {
+    query = cliargs["query"].as<std::string>();
   } else {
     query = get_user_input("Enter " + query_description + ':');
   }
 
-  const TextIndexAccessor indexAccessor(index_path);
+  const BinaryIndexAccessor indexAccessor(index_path);
   const Results results = searcher::search(query, indexAccessor);
   std::size_t outputted = 0;
   std::cout << "id\tscore\ttext\n";
