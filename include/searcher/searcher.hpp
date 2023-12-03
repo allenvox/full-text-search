@@ -43,7 +43,7 @@ class DictionaryAccessor {
 public:
   explicit DictionaryAccessor(uint32_t begin, uint32_t end, std::vector<uint8_t> data)
       : data_(data.begin() + begin, data.begin() + end){};
-  uint32_t retrieve(std::string word) const;
+  uint32_t retrieve(const std::string &word) const;
 private:
   std::vector<uint8_t> data_;
 };
@@ -52,7 +52,7 @@ class EntriesAccessor {
 public:
   explicit EntriesAccessor(uint32_t begin, uint32_t end, std::vector<uint8_t> data)
       : data_(data.begin() + begin, data.begin() + end){};
-  TermInfos get_term_infos(uint32_t offset) const;
+  TermInfos get_term_infos(const std::string &term, const DictionaryAccessor *dia) const;
 private:
   std::vector<uint8_t> data_;
 };
@@ -61,7 +61,7 @@ class DocumentsAccessor {
 public:
   explicit DocumentsAccessor(uint32_t begin, uint32_t end, std::vector<uint8_t> data)
       : data_(data.begin() + begin, data.begin() + end){};
-  std::string load_document(uint32_t id) const;
+  std::string load_document(uint32_t offset) const;
   uint32_t total_docs() const;
 private:
   std::vector<uint8_t> data_;
@@ -74,10 +74,10 @@ public:
   void print_data() const;
   Config config() const override { return config_; };
   TermInfos get_term_infos(const std::string &term) const override {
-    return ea_->get_term_infos(term.size());
+    return ea_->get_term_infos(term, dia_);
   };
-  std::string load_document(std::size_t doc_id) const override {
-      return doa_->load_document(doc_id);
+  std::string load_document(std::size_t offset) const override {
+      return doa_->load_document(offset);
   };
   DocsCount total_docs() const override {
       return doa_->total_docs();
