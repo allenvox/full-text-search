@@ -147,16 +147,73 @@ void BinaryIndexAccessor::print_data() const {
   }
 }
 
-Config BinaryIndexAccessor::config() const {
-  return {};
+uint32_t DictionaryAccessor::retrieve(const std::string &word) const {
+  uint32_t current_offset = 0; // root
+  for (char letter : word) {
+    uint32_t children_count = get_u32_from_u8s(current_offset, data_);
+    current_offset += 4; // to children
+    bool found = false;
+    for (uint32_t i = 0; i < children_count; ++i) {
+      char child_letter = data_[current_offset + i]; // cur child letter
+      if (child_letter == letter) { // found needed child letter
+        current_offset += children_count + 4 * i; // child_offset offset
+        uint32_t child_offset = get_u32_from_u8s(current_offset, data_);
+        current_offset = child_offset; // go to child_offset
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      return 0; // word not in tree
+    }
+  }
+  uint8_t is_leaf = data_[current_offset];
+  if (is_leaf) {
+    ++current_offset; // go to entry offset
+    return get_u32_from_u8s(current_offset, data_);
+  }
+  return 0; // node is not leaf
 }
 
-TermInfos EntriesAccessor::get_term_infos(const uint32_t offset) const {
-  return 0;
+TermInfos EntriesAccessor::get_term_infos(const std::string &term, const DictionaryAccessor *dia) const {
+  TermInfos termInfos;
+  uint32_t term_offset = dia->retrieve(term);
+  if (term_offset == 0) {
+    return termInfos; // term not found
+  }
+  uint32_t doc_count = get_u32_from_u8s(term_offset, data_);
+  uint32_t current_offset = term_offset + 4;
+  for (uint32_t i = 0; i < doc_count; ++i) {
+    uint32_t doc_offset = get_u32_from_u8s(current_offset, data_);
+    current_offset += 4;
+    uint32_t pos_count = get_u32_from_u8s(current_offset, data_);
+    current_offset += 4;
+    using std::to_string;
+    std::string positions;
+    for (uint32_t j = 0; j < pos_count; ++j) {
+      // get every pos
+      uint32_t pos = get_u32_from_u8s(current_offset, data_);
+      current_offset += 4;
+      positions += to_string(pos) + ' ';
+    }
+    termInfos += to_string(doc_offset) + ' ' + to_string(pos_count) + ' ' + positions;
+  }
+  return termInfos;
 }
 
-std::string DocumentsAccessor::load_document(uint32_t doc_id) const {
-  return std::to_string(doc_id);
+std::string DocumentsAccessor::load_document(uint32_t offset) const {
+  uint32_t current_offset = 1; // because of data_[0] is docs count
+  uint8_t title_length;
+  while (current_offset < offset) {
+    title_length = data_[current_offset]; // get current title len
+    current_offset += title_length + 1; // offset += word
+    if (current_offset > offset) {
+      std::cerr << "Offsets didn't match\n";
+      return "ERROR";
+    }
+  }
+  return std::string(data_.begin() + current_offset - title_length,
+                     data_.begin() + current_offset);
 }
 
 uint32_t DocumentsAccessor::total_docs() const {
