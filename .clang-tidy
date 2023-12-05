@@ -33,7 +33,9 @@ Checks: >
   -hicpp-vararg,
   -modernize-use-nullptr,
   -cppcoreguidelines-pro-type-cstyle-cast,
-  -performance-no-int-to-ptr
+  -performance-no-int-to-ptr,
+  -cppcoreguidelines-prefer-member-initializer,
+  -modernize-return-braced-init-list
 WarningsAsErrors: '*'
 HeaderFilterRegex: 'include/(common|config|driver|fts|indexer|indexer-cli|parser|searcher|searcher-c|searcher-cli|sum)'
 AnalyzeTemporaryDtors: false
