@@ -5,9 +5,9 @@
 
 #include <iostream>
 
-IndexText get_user_input(const IndexText &message) {
+std::string get_user_input(const std::string &message) {
   std::cout << message << '\n' << "> ";
-  IndexText input;
+  std::string input;
   getline(std::cin, input);
   return input;
 }

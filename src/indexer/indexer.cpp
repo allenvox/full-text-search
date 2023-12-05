@@ -4,17 +4,17 @@
 #include <picosha2.h>
 #include <string>
 
-void IndexBuilder::add_document(IndexID id, const IndexText &text) {
+void IndexBuilder::add_document(size_t id, const std::string &text) {
   index_.docs.insert({id, text});
   const NgramParser parser;
-  const NgramVec ngrams = parser.parse(text, config_.stop_words,
+  const Ngrams ngrams = parser.parse(text, config_.stop_words,
                                        config_.min_length, config_.max_length);
   for (const auto &ngram : ngrams) {
     index_.entries[ngram.text].push_back({id, ngram.pos});
   }
 }
 
-IndexHash indexer::term_to_hash(const IndexTerm &term) {
+std::string indexer::term_to_hash(const std::string &term) {
   return picosha2::hash256_hex_string(term).substr(0, 6);
 }
 
@@ -40,10 +40,10 @@ void indexer::write_docs(const IndexPath &path, const IndexDocuments &docs) {
   }
 }
 
-IndexText indexer::convert_to_entry_output(
-    const IndexTerm &term, const std::vector<IndexDocToPos> &doc_to_pos_vec) {
-  IndexText output(term + ' ' + std::to_string(doc_to_pos_vec.size()) + ' ');
-  std::vector<IndexID> already_outputted;
+std::string indexer::convert_to_entry_output(
+    const std::string &term, const std::vector<IndexDocToPos> &doc_to_pos_vec) {
+  std::string output(term + ' ' + std::to_string(doc_to_pos_vec.size()) + ' ');
+  std::vector<size_t> already_outputted;
   for (const auto &doc_to_pos1 : doc_to_pos_vec) {
     const auto &id = doc_to_pos1.doc_id;
     if (std::count(already_outputted.begin(), already_outputted.end(), id) == 1) {
@@ -93,10 +93,10 @@ uint32_t indexer::get_offset(const uint32_t id, const IdToOffset &id_to_offset) 
 }
 
 void indexer::push_u32_to_u8(const uint32_t val, BytesVec &vec) {
-  vec.push_back(val & 0xFFU);
-  vec.push_back((val >> 8U) & 0xFFU);
-  vec.push_back((val >> 16U) & 0xFFU);
-  vec.push_back((val >> 24U) & 0xFFU);
+  vec.push_back((val >> 24) & 0xFF);
+  vec.push_back((val >> 16) & 0xFF);
+  vec.push_back((val >> 8) & 0xFF);
+  vec.push_back(val & 0xFF);
 }
 
 BytesVec indexer::serialize_string(const std::string &str) {

@@ -6,18 +6,13 @@
 #include <unordered_map>
 #include <vector>
 
-using IndexID = std::size_t;
-using IndexText = std::string;
-using IndexDocuments = std::unordered_map<IndexID, IndexText>;
-using IndexIdx = std::size_t;
 struct IndexDocToPos {
-  IndexID doc_id;
-  IndexIdx pos;
+  size_t doc_id;
+  size_t pos;
 };
-using IndexDocToPos = struct IndexDocToPos;
-using IndexHash = std::string;
-using IndexTerm = std::string;
-using IndexEntries = std::unordered_map<IndexTerm, std::vector<IndexDocToPos>>;
+using IndexDocuments = std::unordered_map<size_t, std::string>;
+using IndexPath = std::filesystem::path;
+using IndexEntries = std::unordered_map<std::string, std::vector<IndexDocToPos>>;
 using BytesVec = std::vector<uint8_t>;
 
 class Index {
@@ -28,19 +23,17 @@ public:
 
 class IndexBuilder {
 public:
-  IndexBuilder(NgramStopWords stop_words, NgramLength min_length,
-               NgramLength max_length)
-      : config_({std::move(stop_words), min_length, max_length}){};
+  IndexBuilder(const NgramStopWords &stop_words, size_t min_length,
+               size_t max_length)
+      : config_({stop_words, min_length, max_length}){};
   explicit IndexBuilder(Config &cfg = DEFAULT_CONFIG) : config_(std::move(cfg)){};
   Index index() const { return index_; };
-  void add_document(IndexID id, const IndexText &text);
+  void add_document(size_t id, const std::string &text);
 
 private:
   Index index_;
   Config config_;
 };
-
-using IndexPath = std::filesystem::path;
 
 class IndexWriter {
 public:
@@ -60,11 +53,11 @@ public:
 namespace indexer {
 
 // TextIndexWriter
-IndexHash term_to_hash(const IndexTerm &term);
+std::string term_to_hash(const std::string &term);
 void create_index_directories(const IndexPath &path);
 void write_docs(const IndexPath &path, const IndexDocuments &docs);
-IndexText
-convert_to_entry_output(const IndexTerm &term,
+std::string
+convert_to_entry_output(const std::string &term,
                         const std::vector<IndexDocToPos> &doc_to_pos_vec);
 void write_entries(const IndexPath &path, const IndexEntries &entries);
 

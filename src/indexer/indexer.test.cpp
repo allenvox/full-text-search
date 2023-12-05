@@ -6,13 +6,13 @@
 
 TEST(IndexBuilderTest, AddDocument) {
   IndexBuilder builder({"the"}, 3, 6);
-  const IndexID id = 1;
-  const IndexText text = "The Matrix";
+  const size_t id = 1;
+  const std::string text = "The Matrix";
   builder.add_document(id, text);
   const Index index = builder.index();
   ASSERT_EQ(index.docs.size(), 1);
   ASSERT_EQ(index.entries.size(), 4); // 4 ngrams
-  IndexText doc_text = "";
+  std::string doc_text = "";
   auto it = index.docs.find(id);
   if (it != index.docs.end()) {
     doc_text = it->second;
@@ -21,9 +21,9 @@ TEST(IndexBuilderTest, AddDocument) {
 }
 
 TEST(IndexerUtilsTest, TermToHashSize) {
-  const IndexTerm term = "example_term";
-  const IndexHash hash = indexer::term_to_hash(term);
-  const std::size_t expected = 6;
+  const std::string term = "example_term";
+  const std::string hash = indexer::term_to_hash(term);
+  const size_t expected = 6;
   EXPECT_EQ(expected, hash.size());
 }
 
@@ -36,9 +36,9 @@ TEST(IndexerUtilsTest, CreateIndexDirectories) {
 }
 
 TEST(IndexerUtilsTest, ConvertToEntryOutput) {
-  const IndexTerm term = "matrix";
+  const std::string term = "matrix";
   const std::vector<IndexDocToPos> doc_to_pos_vec = {{11, 0}, {22, 0}, {22, 1}};
-  const IndexText output =
+  const std::string output =
       indexer::convert_to_entry_output(term, doc_to_pos_vec);
   const std::string expected_output = "matrix 3 11 1 0 22 2 0 1 \n";
   EXPECT_EQ(output, expected_output);
