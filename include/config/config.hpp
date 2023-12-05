@@ -4,8 +4,8 @@
 
 struct Config {
   NgramStopWords stop_words;
-  NgramLength min_length;
-  NgramLength max_length;
+  size_t min_length;
+  size_t max_length;
 };
 using Config = struct Config;
 
