@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 #include <fcntl.h>
 #include <filesystem>
 #include <fstream>
@@ -95,13 +96,13 @@ Results searcher::search(const SearcherQuery &query,
   return results;
 }
 
-uint32_t get_u32_from_u8s(uint32_t start, const std::vector<uint8_t> &bytes) {
+uint32_t searcher::get_u32_from_u8s(uint32_t start, const std::vector<uint8_t> &bytes) {
   if (start + 3 >= bytes.size()) {
     throw std::runtime_error("Invalid start position for uint32_t extraction");
   }
   uint32_t result = 0;
   for (int i = 0; i < 4; ++i) {
-    result |= static_cast<uint32_t>(bytes[start + i]) << (8 * i);
+    result |= static_cast<uint32_t>(bytes[start + i]) << (8U * i);
   }
   return result;
 }
@@ -123,18 +124,20 @@ BinaryIndexAccessor::BinaryIndexAccessor(std::filesystem::path &path,
   fsize_ = sb.st_size;
 
   // load file to mem with mmap
-  void* mapped_data = mmap(NULL, sb.st_size, PROT_READ, MAP_SHARED, fd, 0);
+  void* mapped_data = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
   if (mapped_data == MAP_FAILED) {
     close(fd);
     throw std::runtime_error("Failed to mmap the index file");
   }
-  data_ = std::vector<uint8_t>(static_cast<uint8_t*>(mapped_data),
-                               static_cast<uint8_t*>(mapped_data) + fsize_);
+  data_ = std::vector<unsigned char>(static_cast<unsigned char*>(mapped_data),
+                               static_cast<unsigned char*>(mapped_data) + fsize_);
   close(fd);
 
-  uint32_t di_offset = get_u32_from_u8s(1 + sizeof("dictionary"), data_);
-  uint32_t e_offset = get_u32_from_u8s(4 + di_offset + sizeof("entries"), data_);
-  uint32_t docs_offset = get_u32_from_u8s(4 + e_offset + sizeof("documents"), data_);
+  uint32_t di_offset, e_offset, docs_offset;
+
+  //uint32_t di_offset = searcher::get_u32_from_u8s(1 + sizeof("dictionary"), data_);
+  //uint32_t e_offset = searcher::get_u32_from_u8s(4 + di_offset + sizeof("entries"), data_);
+  //uint32_t docs_offset = searcher::get_u32_from_u8s(4 + e_offset + sizeof("documents"), data_);
 
   dia_ = new DictionaryAccessor(di_offset, e_offset - 1, data_);
   ea_ = new EntriesAccessor(e_offset, docs_offset - 1, data_);
@@ -142,22 +145,22 @@ BinaryIndexAccessor::BinaryIndexAccessor(std::filesystem::path &path,
 }
 
 void BinaryIndexAccessor::print_data() const {
-  for (const auto& byte : data_) {
-    std::cout << std::hex << byte << " (" << std::dec << byte << ")\n";
-  }
+  uint8_t section_count;
+  std::memcpy(&data_, &section_count, sizeof(uint8_t));
+  std::cout << section_count << '\n';
 }
 
 uint32_t DictionaryAccessor::retrieve(const std::string &word) const {
   uint32_t current_offset = 0; // root
   for (char letter : word) {
-    uint32_t children_count = get_u32_from_u8s(current_offset, data_);
+    uint32_t children_count = searcher::get_u32_from_u8s(current_offset, data_);
     current_offset += 4; // to children
     bool found = false;
     for (uint32_t i = 0; i < children_count; ++i) {
-      char child_letter = data_[current_offset + i]; // cur child letter
+      auto child_letter = static_cast<char>(data_[current_offset + i]); // cur child letter
       if (child_letter == letter) { // found needed child letter
         current_offset += children_count + 4 * i; // child_offset offset
-        uint32_t child_offset = get_u32_from_u8s(current_offset, data_);
+        uint32_t child_offset = searcher::get_u32_from_u8s(current_offset, data_);
         current_offset = child_offset; // go to child_offset
         found = true;
         break;
@@ -168,9 +171,9 @@ uint32_t DictionaryAccessor::retrieve(const std::string &word) const {
     }
   }
   uint8_t is_leaf = data_[current_offset];
-  if (is_leaf) {
+  if (is_leaf != 0U) {
     ++current_offset; // go to entry offset
-    return get_u32_from_u8s(current_offset, data_);
+    return searcher::get_u32_from_u8s(current_offset, data_);
   }
   return 0; // node is not leaf
 }
@@ -181,18 +184,18 @@ TermInfos EntriesAccessor::get_term_infos(const std::string &term, const Diction
   if (term_offset == 0) {
     return termInfos; // term not found
   }
-  uint32_t doc_count = get_u32_from_u8s(term_offset, data_);
+  uint32_t doc_count = searcher::get_u32_from_u8s(term_offset, data_);
   uint32_t current_offset = term_offset + 4;
   for (uint32_t i = 0; i < doc_count; ++i) {
-    uint32_t doc_offset = get_u32_from_u8s(current_offset, data_);
+    uint32_t doc_offset = searcher::get_u32_from_u8s(current_offset, data_);
     current_offset += 4;
-    uint32_t pos_count = get_u32_from_u8s(current_offset, data_);
+    uint32_t pos_count = searcher::get_u32_from_u8s(current_offset, data_);
     current_offset += 4;
     using std::to_string;
     std::string positions;
     for (uint32_t j = 0; j < pos_count; ++j) {
       // get every pos
-      uint32_t pos = get_u32_from_u8s(current_offset, data_);
+      uint32_t pos = searcher::get_u32_from_u8s(current_offset, data_);
       current_offset += 4;
       positions += to_string(pos) + ' ';
     }
@@ -203,7 +206,7 @@ TermInfos EntriesAccessor::get_term_infos(const std::string &term, const Diction
 
 std::string DocumentsAccessor::load_document(uint32_t offset) const {
   uint32_t current_offset = 1; // because of data_[0] is docs count
-  uint8_t title_length;
+  uint8_t title_length = 0;
   while (current_offset < offset) {
     title_length = data_[current_offset]; // get current title len
     current_offset += title_length + 1; // offset += word
@@ -217,5 +220,5 @@ std::string DocumentsAccessor::load_document(uint32_t offset) const {
 }
 
 uint32_t DocumentsAccessor::total_docs() const {
-  return get_u32_from_u8s(0, data_);
+  return searcher::get_u32_from_u8s(0, data_);
 }
