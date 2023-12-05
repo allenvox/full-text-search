@@ -25,9 +25,9 @@ enum ColumnHeader { ID_column, Text_column };
 Index generate_index(IndexPath &csv_path, Config &cfg) {
   const rapidcsv::Document csv(csv_path);
   IndexBuilder indexBuilder(cfg);
-  for (std::size_t i = 0; i < csv.GetRowCount(); ++i) {
-    auto id = csv.GetCell<IndexID>(ID_column, i);
-    auto txt = csv.GetCell<IndexText>(Text_column, i);
+  for (size_t i = 0; i < csv.GetRowCount(); ++i) {
+    auto id = csv.GetCell<size_t>(ID_column, i);
+    auto txt = csv.GetCell<std::string>(Text_column, i);
     indexBuilder.add_document(id, txt);
   }
   return indexBuilder.index();
