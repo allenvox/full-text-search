@@ -4,7 +4,8 @@
 #include <indexer/indexer.hpp>
 #include <searcher/searcher.hpp>
 
-std::filesystem::path testPath = "./build/test";
+std::filesystem::path testPath = "build/test";
+std::filesystem::path testWritePath = ".";
 std::filesystem::path testBinaryPath = "./index/index.bin";
 size_t testID = 363;
 size_t testOffset = 10;
@@ -59,7 +60,7 @@ TEST(SearcherTest, BinaryGetConfig) {
   indexBuilder.add_document(testID + 1, "hello");
   Index index = indexBuilder.index();
   BinaryIndexWriter writer;
-  writer.write(testPath, index);
+  writer.write(testWritePath, index);
   const BinaryIndexAccessor indexAccessor(testBinaryPath, testConfig);
   const Config cfg = indexAccessor.config();
   EXPECT_EQ(cfg.min_length, testConfig.min_length);
@@ -73,7 +74,7 @@ TEST(SearcherTest, BinaryGetTermInfos) {
   indexBuilder.add_document(testID + 1, "hello");
   Index index = indexBuilder.index();
   BinaryIndexWriter writer;
-  writer.write(testPath, index);
+  writer.write(testWritePath, index);
   const BinaryIndexAccessor indexAccessor(testBinaryPath, testConfig);
   const std::string termInfos = indexAccessor.get_term_infos(testTerm);
   EXPECT_EQ(testBinaryTermInfos, termInfos);
@@ -86,7 +87,7 @@ TEST(SearcherTest, BinaryTotalDocs) {
   indexBuilder.add_document(testID + 1, "hello");
   Index index = indexBuilder.index();
   BinaryIndexWriter writer;
-  writer.write(testPath, index);
+  writer.write(testWritePath, index);
   const BinaryIndexAccessor indexAccessor(testBinaryPath, testConfig);
   EXPECT_EQ(indexAccessor.total_docs(), testDocsCount);
 }
@@ -98,7 +99,7 @@ TEST(SearcherTest, BinarySearch) {
   indexBuilder.add_document(testID + 1, "hello");
   Index index = indexBuilder.index();
   BinaryIndexWriter writer;
-  writer.write(testPath, index);
+  writer.write(testWritePath, index);
   const BinaryIndexAccessor indexAccessor(testBinaryPath, testConfig);
   Results results = searcher::search(testSearcherQuery, indexAccessor);
   EXPECT_EQ(results[0].doc_id, testOffset);

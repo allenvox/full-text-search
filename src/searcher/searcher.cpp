@@ -166,7 +166,9 @@ BinaryIndexAccessor::BinaryIndexAccessor(const std::filesystem::path &path,
   config_ = config;
   fd_ = open(path.c_str(), O_RDONLY);
   if (fd_ < 0) {
-    throw std::invalid_argument("File reading error");
+    throw std::invalid_argument("File reading error " + std::string(path) +
+                                ", currently in " +
+                                std::string(std::filesystem::current_path()));
   }
   const auto size = std::filesystem::file_size(path);
   data_.set_data(
