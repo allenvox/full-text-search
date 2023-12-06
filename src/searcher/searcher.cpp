@@ -101,7 +101,7 @@ std::string DocumentsAccessor::load_document(size_t offset) {
 }
 
 std::string EntriesAccessor::get_term_infos(const std::string &term) {
-  size_t this_term_offset = dia_->retrieve(term);
+  const size_t this_term_offset = dia_->retrieve(term);
   std::string term_info = term + ' ';
   uint32_t docs_count = 0;
   data_.set_current_position(section_offsets_->at("entries") +
@@ -148,8 +148,8 @@ size_t DictionaryAccessor::retrieve(const std::string &word) {
     data_.set_current_position(dictionary_offset + child_offset);
   }
   data_.read(children_count);
-  size_t leaf_info_pos = data_.get_current_position() + children_count +
-                         children_count * sizeof(uint32_t);
+  const size_t leaf_info_pos = data_.get_current_position() + children_count +
+                               children_count * sizeof(uint32_t);
   data_.set_current_position(leaf_info_pos);
   uint8_t is_leaf = 0;
   data_.read(is_leaf);
