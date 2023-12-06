@@ -1,14 +1,14 @@
 import readchar
 import searcher
 
-index_path = input("Enter index path: ")
+index_path = input("Enter index.bin path: ")
 query = input("Enter searcher query: ")
 
-accessor = searcher.initialize(index_path)
-ids, scores, size = searcher.search(accessor, query)
-searcher.finalize(accessor)
+accessor = searcher.initialize_binary(index_path)
+ids, scores, size = searcher.search_binary(accessor, query)
+searcher.finalize_binary(accessor)
 
-print("score\tid\tdocument")
+print("score\toffset\tdocument")
 for i in range(size.value):
     docpath = index_path + "/index/docs/" + str(ids[i])
     with open(docpath) as f: name = f.readline().strip('\n')
