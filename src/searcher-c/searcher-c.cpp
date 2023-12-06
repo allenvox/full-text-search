@@ -71,7 +71,7 @@ void search_text(void *accessor, const char *query, unsigned int *doc_ids,
 }
 
 void search_binary(void *accessor, const char *query, unsigned int *doc_ids,
-                 double *scores, unsigned int *result_count) {
+                   double *scores, unsigned int *result_count) {
   if (accessor == NULL || query == NULL || doc_ids == NULL || scores == NULL ||
       result_count == NULL) {
     return;
