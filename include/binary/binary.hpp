@@ -7,7 +7,8 @@
 class BinaryHandler {
 public:
   BinaryHandler() : is_allocated(true) {
-    data_ = static_cast<char *>(malloc(capacity_));
+    // Use calloc instead of malloc to initialize memory to zero
+    data_ = static_cast<char *>(calloc(capacity_, 1));
     if (data_ == nullptr) {
       throw std::runtime_error("Not enough memory");
     }
@@ -115,16 +116,13 @@ private:
     }
     const size_t position = cursor_ - data_;
     capacity_ = new_capacity;
-    char *tmp = (char*)realloc(data_, capacity_);
-    if (tmp != nullptr) {
-      data_ = tmp;
-    } else {
+    char *tmp = static_cast<char*>(realloc(data_, capacity_));
+    if (tmp == nullptr) {
       throw std::runtime_error("Not enough memory");
     }
-    /*data_ = static_cast<char *>(realloc(data_, capacity_));
-    if (data_ == nullptr) {
-      throw std::runtime_error("Not enough memory");
-    }*/
+    // Initialize the new portion of the buffer to zero
+    std::memset(tmp + position, 0, capacity_ - position);
+    data_ = tmp;
     cursor_ = data_ + position;
   }
 };

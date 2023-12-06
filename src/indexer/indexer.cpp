@@ -148,19 +148,11 @@ void BinaryIndexWriter::write_entries(BinaryHandler &buf, const Index &index) {
   //   id: { pos1, pos2 ... }
   //   ...
   // ] ...
-
-  // index.entries:
-  // term: {id1: pos, id2: pos, id1: pos}
   for (const auto &[term, doc_to_pos_vec] : index.entries) {
     for (const auto &doc_to_pos : doc_to_pos_vec) {
       size_t pos = doc_to_pos.pos;
       size_t id = doc_to_pos.doc_id;
       occur[term][id].push_back(pos);
-      /*if (auto search = occur[term].find(id); search == occur[term].end()) {
-        occur[term][id] = {pos};
-      } else {
-        occur[term][id].push_back(pos);
-      }*/
     }
   }
 
