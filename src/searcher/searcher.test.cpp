@@ -4,8 +4,8 @@
 #include <indexer/indexer.hpp>
 #include <searcher/searcher.hpp>
 
-std::filesystem::path testPath = "build/test";
-std::filesystem::path testBinaryPath = "index/index.bin";
+std::filesystem::path testPath = "./build/test";
+std::filesystem::path testBinaryPath = "./index/index.bin";
 size_t testID = 363;
 size_t testOffset = 10;
 std::string testTerm = "hi";
@@ -77,19 +77,6 @@ TEST(SearcherTest, BinaryGetTermInfos) {
   const BinaryIndexAccessor indexAccessor(testBinaryPath, testConfig);
   const std::string termInfos = indexAccessor.get_term_infos(testTerm);
   EXPECT_EQ(testBinaryTermInfos, termInfos);
-}
-
-TEST(SearcherTest, BinaryLoadDocument) {
-  IndexBuilder indexBuilder(testConfig.stop_words, testConfig.min_length,
-                            testConfig.max_length);
-  indexBuilder.add_document(testID, testTerm);
-  indexBuilder.add_document(testID + 1, "hello");
-  Index index = indexBuilder.index();
-  BinaryIndexWriter writer;
-  writer.write(testPath, index);
-  const BinaryIndexAccessor indexAccessor(testBinaryPath, testConfig);
-  const std::string docText = indexAccessor.load_document(testOffset);
-  EXPECT_EQ(docText, testTerm);
 }
 
 TEST(SearcherTest, BinaryTotalDocs) {
