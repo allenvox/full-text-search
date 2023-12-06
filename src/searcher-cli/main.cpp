@@ -12,7 +12,7 @@ std::string get_user_input(const std::string &message) {
   return input;
 }
 
-const std::string index_description = "path to folder with saved index";
+const std::string index_description = "path to saved index.bin";
 const std::string query_description = "query to searcher";
 
 int main(int argc, char **argv) {
@@ -43,9 +43,9 @@ int main(int argc, char **argv) {
     query = get_user_input("Enter " + query_description + ':');
   }
 
-  const BinaryIndexAccessor indexAccessor(index_path);
+  BinaryIndexAccessor indexAccessor(index_path);
   const Results results = searcher::search(query, indexAccessor);
-  std::size_t outputted = 0;
+  size_t outputted = 0;
   std::cout << "id\tscore\ttext\n";
   for (const auto &result : results) {
     if (outputted == 5) {
@@ -55,7 +55,7 @@ int main(int argc, char **argv) {
         break;
       }
     }
-    const IndexID id = result.doc_id;
+    const size_t id = result.doc_id;
     std::cout << id << '\t' << result.score << '\t'
               << indexAccessor.load_document(id) << '\n';
     outputted++;
