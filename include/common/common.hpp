@@ -38,6 +38,5 @@ public:
                          size_t ngram_max_length) const;
 
   Ngrams parse(const std::string &text, const NgramStopWords &stop_words,
-                 size_t ngram_min_length,
-                 size_t ngram_max_length) const override;
+               size_t ngram_min_length, size_t ngram_max_length) const override;
 };
