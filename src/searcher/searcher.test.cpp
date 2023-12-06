@@ -7,10 +7,10 @@
 std::filesystem::path testPath = "build/test";
 std::filesystem::path testBinaryPath = "index/index.bin";
 size_t testID = 363;
-size_t testOffset = 4;
+size_t testOffset = 10;
 std::string testTerm = "hi";
 std::string testTermInfos = "hi 1 363 1 0 ";
-std::string testBinaryTermInfos = "hi 1 4 1 0 ";
+std::string testBinaryTermInfos = "hi 1 10 1 0 ";
 Config testConfig = {{}, 1, 3};
 size_t testDocsCount = 2;
 std::string testSearcherQuery = "hi";
