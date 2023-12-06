@@ -38,9 +38,11 @@ public:
     if (capacity_ - (cursor_ - data_) < sizeof(value)) {
       increase_capacity(capacity_ * 2 + sizeof(value));
     }
+    if (static_cast<size_t>(cursor_ - data_) >= size_) {
+      size_ += sizeof(value);
+    }
     std::memcpy(cursor_, &value, sizeof(value));
     cursor_ += sizeof(value);
-    size_ += sizeof(value);
   }
 
   template <typename StringType> void write_string(const StringType &value) {
@@ -116,7 +118,7 @@ private:
     }
     const size_t position = cursor_ - data_;
     capacity_ = new_capacity;
-    char *tmp = static_cast<char*>(realloc(data_, capacity_));
+    char *tmp = static_cast<char *>(realloc(data_, capacity_));
     if (tmp == nullptr) {
       throw std::runtime_error("Not enough memory");
     }
