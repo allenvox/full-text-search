@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
   BinaryIndexAccessor indexAccessor(index_path);
   const Results results = searcher::search(query, indexAccessor);
   size_t outputted = 0;
-  std::cout << "id\tscore\ttext\n";
+  std::cout << "id / offset\tscore\ttext\n";
   for (const auto &result : results) {
     if (outputted == 5) {
       std::cout << "press Q to exit or any other key to output all results ";
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
       }
     }
     const size_t id = result.doc_id;
-    std::cout << id << '\t' << result.score << '\t'
+    std::cout << id << "\t\t" << result.score << '\t'
               << indexAccessor.load_document(id) << '\n';
     outputted++;
   }
