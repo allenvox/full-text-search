@@ -2,6 +2,7 @@ set(target_name searcher)
 add_library(${target_name} STATIC
   ${PROJECT_SOURCE_DIR}/include/${target_name}/${target_name}.hpp
   searcher.cpp
+  ${PROJECT_SOURCE_DIR}/include/binary/binary.hpp
 )
 set_compile_options(${target_name})
 target_include_directories(
@@ -20,6 +21,7 @@ set(test_name searcher.test)
 add_executable(
   ${test_name}
   ${test_name}.cpp
+  ${PROJECT_SOURCE_DIR}/include/binary/binary.hpp
 )
 set_compile_options(${test_name})
 target_include_directories(
