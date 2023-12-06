@@ -77,6 +77,9 @@ public:
     dia_ = new DictionaryAccessor(data_, section_offsets);
   }
   std::string get_term_infos(const std::string &term);
+  ~EntriesAccessor() {
+    delete dia_;
+  }
 
 private:
   BinaryHandler data_;
