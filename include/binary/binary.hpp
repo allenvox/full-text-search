@@ -115,10 +115,16 @@ private:
     }
     const size_t position = cursor_ - data_;
     capacity_ = new_capacity;
-    data_ = static_cast<char *>(realloc(data_, capacity_));
-    if (data_ == nullptr) {
+    char *tmp = (char*)realloc(data_, capacity_);
+    if (tmp != nullptr) {
+      data_ = tmp;
+    } else {
       throw std::runtime_error("Not enough memory");
     }
+    /*data_ = static_cast<char *>(realloc(data_, capacity_));
+    if (data_ == nullptr) {
+      throw std::runtime_error("Not enough memory");
+    }*/
     cursor_ = data_ + position;
   }
 };
