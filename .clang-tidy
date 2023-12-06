@@ -38,7 +38,11 @@ Checks: >
   -modernize-return-braced-init-list,
   -hicpp-signed-bitwise,
   -cppcoreguidelines-no-malloc,
-  -hicpp-no-malloc
+  -hicpp-no-malloc,
+  -misc-no-recursion,
+  -cppcoreguidelines-special-member-functions,
+  -hicpp-special-member-functions,
+  -misc-non-private-member-variables-in-classes
 WarningsAsErrors: '*'
 HeaderFilterRegex: 'include/(common|config|driver|fts|indexer|indexer-cli|parser|searcher|searcher-c|searcher-cli|sum)'
 AnalyzeTemporaryDtors: false
