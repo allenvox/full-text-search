@@ -76,10 +76,8 @@ TEST(TextIndexWriterTest, Write) {
 }
 
 TEST(BinaryIndexWriterTest, Write) {
-  IndexBuilder indexbuilder({"the"}, 3, 6);
-  indexbuilder.add_document(199903, "The Matrix");
-  indexbuilder.add_document(200305, "The Matrix Reloaded");
-  indexbuilder.add_document(200311, "The Matrix Revolution");
+  IndexBuilder indexbuilder({}, 2, 3);
+  indexbuilder.add_document(1, "Hi");
   Index index = indexbuilder.index();
 
   IndexPath testPath = ".";
