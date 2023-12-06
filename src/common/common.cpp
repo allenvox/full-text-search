@@ -54,11 +54,10 @@ NgramParser::remove_stop_words(const NgramWords &words,
   return words_without_stops;
 }
 
-Ngrams
-NgramParser::generate_ngrams(const NgramWords &words,
-                             const NgramStopWords &stop_words,
-                             const size_t ngram_min_length,
-                             const size_t ngram_max_length) const {
+Ngrams NgramParser::generate_ngrams(const NgramWords &words,
+                                    const NgramStopWords &stop_words,
+                                    const size_t ngram_min_length,
+                                    const size_t ngram_max_length) const {
   Ngrams ngrams;
   for (const auto &word : words) {
     for (size_t length = ngram_min_length;

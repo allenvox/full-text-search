@@ -41,8 +41,8 @@ int main(int argc, char **argv) {
   }
   driver::check_if_exists(index_path);
 
-  const Index idx = driver::generate_index(csv_path);
-  const BinaryIndexWriter writer;
+  Index idx = driver::generate_index(csv_path);
+  BinaryIndexWriter writer;
   writer.write(index_path, idx);
   return 0;
 }
