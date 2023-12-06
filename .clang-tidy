@@ -42,7 +42,10 @@ Checks: >
   -misc-no-recursion,
   -cppcoreguidelines-special-member-functions,
   -hicpp-special-member-functions,
-  -misc-non-private-member-variables-in-classes
+  -misc-non-private-member-variables-in-classes,
+  -cppcoreguidelines-virtual-class-destructor,
+  -cppcoreguidelines-avoid-const-or-ref-data-members,
+  -misc-const-correctness
 WarningsAsErrors: '*'
 HeaderFilterRegex: 'include/(common|config|driver|fts|indexer|indexer-cli|parser|searcher|searcher-c|searcher-cli|sum)'
 AnalyzeTemporaryDtors: false
