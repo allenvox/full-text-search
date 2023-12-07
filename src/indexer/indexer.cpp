@@ -129,7 +129,8 @@ void BinaryIndexWriter::write_header(BinaryHandler &buf) {
 
 void BinaryIndexWriter::write_docs(BinaryHandler &buf, const Index &index) {
   const uint32_t begin = buf.get_current_position();
-  buf.set_current_position(header_.section_offsets.at(sections_.at(Docs)));
+  buf.set_current_position(
+      header_.section_offsets.at(sections_.at(Section::Docs)));
   buf.skip_string(1);
   buf.write(begin);
   buf.set_current_position(begin);
@@ -157,7 +158,8 @@ void BinaryIndexWriter::write_entries(BinaryHandler &buf, const Index &index) {
   }
 
   const uint32_t entries_offset = buf.get_current_position();
-  buf.set_current_position(header_.section_offsets.at(sections_.at(Entries)));
+  buf.set_current_position(
+      header_.section_offsets.at(sections_.at(Section::Entries)));
   buf.skip_string(1);
   buf.write(entries_offset);
   buf.set_current_position(entries_offset);
@@ -201,7 +203,7 @@ void BinaryIndexWriter::write_dictionary(BinaryHandler &buf,
                                          const Index &index) {
   const uint32_t begin = buf.get_current_position();
   buf.set_current_position(
-      header_.section_offsets.at(sections_.at(Dictionary)));
+      header_.section_offsets.at(sections_.at(Section::Dictionary)));
   buf.skip_string(1);
   buf.write(begin);
   buf.set_current_position(begin);

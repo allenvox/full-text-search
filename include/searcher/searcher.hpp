@@ -89,13 +89,8 @@ class BinaryIndexAccessor : public IndexAccessor {
 public:
   explicit BinaryIndexAccessor(const std::filesystem::path &path,
                                Config &config = DEFAULT_CONFIG);
-  BinaryIndexAccessor(BinaryIndexAccessor &other) = default;
-  BinaryIndexAccessor(BinaryIndexAccessor &&other) = default;
   ~BinaryIndexAccessor();
-  BinaryIndexAccessor &operator=(const BinaryIndexAccessor &other) = default;
-  BinaryIndexAccessor &operator=(BinaryIndexAccessor &&other) = default;
   Config config() const override { return config_; }
-
   size_t total_docs() const override { return doa_->total_docs(); }
 
   std::string load_document(size_t id) const override {

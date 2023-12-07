@@ -79,7 +79,6 @@ TEST(BinaryIndexWriterTest, Write) {
   IndexBuilder indexbuilder({}, 2, 3);
   indexbuilder.add_document(1, "Hi");
   Index index = indexbuilder.index();
-
   IndexPath testPath = ".";
   BinaryIndexWriter writer;
   writer.write(testPath, index);

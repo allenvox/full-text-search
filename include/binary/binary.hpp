@@ -7,7 +7,7 @@
 class BinaryHandler {
 public:
   BinaryHandler() : is_allocated(true) {
-    // Use calloc instead of malloc to initialize memory to zero
+    // calloc instead of malloc to initialize memory to zero
     data_ = static_cast<char *>(calloc(capacity_, 1));
     if (data_ == nullptr) {
       throw std::runtime_error("Not enough memory");
@@ -22,11 +22,6 @@ public:
       throw std::invalid_argument("Buffer is null");
     }
   }
-
-  BinaryHandler(BinaryHandler &other) = default;
-  BinaryHandler(BinaryHandler &&other) = default;
-  BinaryHandler &operator=(const BinaryHandler &other) = default;
-  BinaryHandler &operator=(BinaryHandler &&other) = default;
 
   ~BinaryHandler() {
     if (is_allocated) {

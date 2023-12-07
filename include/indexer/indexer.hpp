@@ -72,10 +72,6 @@ public:
     root_->is_leaf = false;
     root_->parent = nullptr;
   }
-  Trie(Trie &other) = default;
-  Trie(Trie &&other) noexcept = default;
-  Trie &operator=(const Trie &other) = default;
-  Trie &operator=(Trie &&other) noexcept = default;
   ~Trie() { clear(root_); }
   void insert(const std::string &word);
   std::string retrieve(const TrieNode *node);
@@ -98,9 +94,12 @@ public:
   void write(IndexPath &path, Index &index) override;
 
 private:
-  enum { Docs, Entries, Dictionary };
-  const std::unordered_map<size_t, std::string> sections_ = {
-      {Docs, "docs"}, {Entries, "entries"}, {Dictionary, "dictionary"}};
+  enum class Section { Docs, Entries, Dictionary };
+  const std::unordered_map<Section, std::string> sections_ = {
+      {Section::Docs, "docs"},
+      {Section::Entries, "entries"},
+      {Section::Dictionary, "dictionary"}};
+
   std::unordered_map<size_t, size_t> id_to_offset_;
   std::unordered_map<std::string, size_t> term_to_offset_;
   std::unordered_map<TrieNode *, std::pair<size_t, size_t>> children_offsets_;
