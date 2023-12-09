@@ -6,6 +6,7 @@ add_library(${target_name} SHARED
   ${PROJECT_SOURCE_DIR}/src/config/config.cpp
   ${PROJECT_SOURCE_DIR}/include/searcher/searcher.hpp
   ${PROJECT_SOURCE_DIR}/src/searcher/searcher.cpp
+  ${PROJECT_SOURCE_DIR}/include/binary/binary.hpp
 )
 target_compile_options(${target_name} PRIVATE -fPIC)
 set_target_properties(
@@ -21,4 +22,6 @@ target_include_directories(${target_name}
 target_link_libraries(${target_name}
   PRIVATE
     common
+    indexer
+    searcher
 )

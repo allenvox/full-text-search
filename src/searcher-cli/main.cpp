@@ -12,7 +12,7 @@ std::string get_user_input(const std::string &message) {
   return input;
 }
 
-const std::string index_description = "path to folder with saved index";
+const std::string index_description = "path to saved index.bin";
 const std::string query_description = "query to searcher";
 
 int main(int argc, char **argv) {
@@ -28,25 +28,25 @@ int main(int argc, char **argv) {
     ("query", query_description, cxxopts::value<std::string>());
   // clang-format on
 
-  const auto result = options.parse(argc, argv);
+  const auto cliargs = options.parse(argc, argv);
 
-  if (result.count("index") == 1) {
-    index_path = result["index"].as<IndexPath>();
+  if (cliargs.count("index") == 1) {
+    index_path = cliargs["index"].as<IndexPath>();
   } else {
     index_path = get_user_input("Enter " + index_description + ':');
   }
   driver::check_if_exists(index_path);
 
-  if (result.count("query") == 1) {
-    query = result["query"].as<std::string>();
+  if (cliargs.count("query") == 1) {
+    query = cliargs["query"].as<std::string>();
   } else {
     query = get_user_input("Enter " + query_description + ':');
   }
 
-  const TextIndexAccessor indexAccessor(index_path);
+  BinaryIndexAccessor indexAccessor(index_path);
   const Results results = searcher::search(query, indexAccessor);
-  std::size_t outputted = 0;
-  std::cout << "id\tscore\ttext\n";
+  size_t outputted = 0;
+  std::cout << "id / offset\tscore\ttext\n";
   for (const auto &result : results) {
     if (outputted == 5) {
       std::cout << "press Q to exit or any other key to output all results ";
@@ -55,8 +55,8 @@ int main(int argc, char **argv) {
         break;
       }
     }
-    const IndexID id = result.doc_id;
-    std::cout << id << '\t' << result.score << '\t'
+    const size_t id = result.doc_id;
+    std::cout << id << "\t\t" << result.score << '\t'
               << indexAccessor.load_document(id) << '\n';
     outputted++;
   }

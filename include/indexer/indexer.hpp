@@ -1,24 +1,21 @@
 #pragma once
 
+#include <binary/binary.hpp>
 #include <common/common.hpp>
 #include <config/config.hpp>
+
 #include <filesystem>
 #include <unordered_map>
 #include <vector>
 
-using IndexID = std::size_t;
-using IndexText = std::string;
-using IndexDocuments = std::unordered_map<IndexID, IndexText>;
-using IndexIdx = std::size_t;
-
 struct IndexDocToPos {
-  IndexID doc_id;
-  IndexIdx pos;
+  size_t doc_id;
+  size_t pos;
 };
-using IndexDocToPos = struct IndexDocToPos;
-using IndexHash = std::string;
-using IndexTerm = std::string;
-using IndexEntries = std::unordered_map<IndexTerm, std::vector<IndexDocToPos>>;
+using IndexDocuments = std::unordered_map<size_t, std::string>;
+using IndexPath = std::filesystem::path;
+using IndexEntries =
+    std::unordered_map<std::string, std::vector<IndexDocToPos>>;
 
 class Index {
 public:
@@ -28,39 +25,93 @@ public:
 
 class IndexBuilder {
 public:
-  IndexBuilder(NgramStopWords stop_words, NgramLength min_length,
-               NgramLength max_length)
-      : config_({std::move(stop_words), min_length, max_length}){};
-  IndexBuilder(Config &cfg = DEFAULT_CONFIG) : config_(std::move(cfg)){};
+  IndexBuilder(const NgramStopWords &stop_words, size_t min_length,
+               size_t max_length)
+      : config_({stop_words, min_length, max_length}){};
+  explicit IndexBuilder(Config &cfg = DEFAULT_CONFIG)
+      : config_(std::move(cfg)){};
   Index index() const { return index_; };
-  void add_document(IndexID id, const IndexText &text);
+  void add_document(size_t id, const std::string &text);
 
 private:
   Index index_;
   Config config_;
 };
 
-using IndexPath = std::filesystem::path;
-
 class IndexWriter {
 public:
-  virtual void write(IndexPath path, Index index) const = 0;
+  virtual void write(IndexPath &path, Index &index) = 0;
 };
 
 class TextIndexWriter : public IndexWriter {
 public:
-  void write(IndexPath path, Index index) const;
+  void write(IndexPath &path, Index &index) override;
+  std::string convert_to_entry_output(
+      const std::string &term,
+      const std::vector<IndexDocToPos> &doc_to_pos_vec) const;
+  void create_index_directories(const IndexPath &path) const;
+  std::string term_to_hash(const std::string &term) const;
+
+private:
+  void write_docs(const IndexPath &path, const IndexDocuments &docs) const;
+  void write_entries(const IndexPath &path, const IndexEntries &entries) const;
 };
 
-namespace indexer {
+struct TrieNode {
+  char data;
+  bool is_leaf{false};
+  TrieNode *parent{nullptr};
+  std::unordered_map<char, TrieNode *> children;
+  explicit TrieNode(char c) : data(c) {}
+};
 
-IndexHash term_to_hash(const IndexTerm &term);
-void throw_index_fs_error();
-void create_index_directories(const IndexPath &path);
-void write_docs(const IndexPath &path, const IndexDocuments &docs);
-IndexText
-convert_to_entry_output(const IndexTerm &term,
-                        const std::vector<IndexDocToPos> &doc_to_pos_vec);
-void write_entries(const IndexPath &path, const IndexEntries &entries);
+class Trie {
+public:
+  Trie() {
+    root_ = new TrieNode('\0');
+    root_->is_leaf = false;
+    root_->parent = nullptr;
+  }
+  ~Trie() { clear(root_); }
+  void insert(const std::string &word);
+  std::string retrieve(const TrieNode *node);
+  TrieNode *root() const { return root_; }
+  size_t size() const { return size_; }
 
-} // namespace indexer
+private:
+  size_t size_{0};
+  TrieNode *root_{nullptr};
+  void clear(TrieNode *current) {
+    for (auto &[c, node] : current->children) {
+      clear(node);
+    }
+    delete current;
+  }
+};
+
+class BinaryIndexWriter : public IndexWriter {
+public:
+  void write(IndexPath &path, Index &index) override;
+
+private:
+  enum class Section { Docs, Entries, Dictionary };
+  const std::unordered_map<Section, std::string> sections_ = {
+      {Section::Docs, "docs"},
+      {Section::Entries, "entries"},
+      {Section::Dictionary, "dictionary"}};
+
+  std::unordered_map<size_t, size_t> id_to_offset_;
+  std::unordered_map<std::string, size_t> term_to_offset_;
+  std::unordered_map<TrieNode *, std::pair<size_t, size_t>> children_offsets_;
+
+  struct Header {
+    std::unordered_map<std::string, size_t> section_offsets;
+  } header_;
+
+  void write_header(BinaryHandler &buf);
+  void write_docs(BinaryHandler &buf, const Index &index);
+  void write_entries(BinaryHandler &buf, const Index &index);
+  void build_dictionary(BinaryHandler &buf, Trie &trie, TrieNode *current,
+                        uint32_t begin);
+  void write_dictionary(BinaryHandler &buf, const Index &index);
+};

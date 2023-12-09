@@ -1,18 +1,17 @@
-
 #include <common/common.hpp>
 
 #include <algorithm>
 #include <cctype>
 #include <string>
 
-bool NgramParser::is_stop_word(const NgramWord &word,
+bool NgramParser::is_stop_word(const std::string &word,
                                const NgramStopWords &stop_words) const {
   return std::find(stop_words.begin(), stop_words.end(), word) !=
          stop_words.end();
 }
 
-NgramText NgramParser::clear_text(const NgramText &source) const {
-  NgramText text; // buffer for formatted text
+std::string NgramParser::clear_text(const std::string &source) const {
+  std::string text; // buffer for formatted text
   text.reserve(source.length());
 
   // remove punctuation marks
@@ -28,13 +27,13 @@ NgramText NgramParser::clear_text(const NgramText &source) const {
   return text;
 }
 
-NgramWords NgramParser::split_in_words(const NgramText &text,
+NgramWords NgramParser::split_in_words(const std::string &text,
                                        const char separator) const {
   NgramWords words;
-  NgramLength start = 0;
-  NgramLength end = text.find(separator);
+  size_t start = 0;
+  size_t end = text.find(separator);
   while (end != std::string::npos) {
-    const NgramWord word = text.substr(start, end - start);
+    const std::string word = text.substr(start, end - start);
     words.push_back(word);
     start = end + 1;
     end = text.find(' ', start);
@@ -47,7 +46,7 @@ NgramWords
 NgramParser::remove_stop_words(const NgramWords &words,
                                const NgramStopWords &stop_words) const {
   NgramWords words_without_stops;
-  for (const NgramWord &word : words) {
+  for (const std::string &word : words) {
     if (!is_stop_word(word, stop_words)) {
       words_without_stops.push_back(word);
     }
@@ -55,16 +54,15 @@ NgramParser::remove_stop_words(const NgramWords &words,
   return words_without_stops;
 }
 
-NgramVec
-NgramParser::generate_ngrams(const NgramWords &words,
-                             const NgramStopWords &stop_words,
-                             const NgramLength ngram_min_length,
-                             const NgramLength ngram_max_length) const {
-  NgramVec ngrams;
-  for (const NgramWord &word : words) {
-    for (NgramLength length = ngram_min_length;
+Ngrams NgramParser::generate_ngrams(const NgramWords &words,
+                                    const NgramStopWords &stop_words,
+                                    const size_t ngram_min_length,
+                                    const size_t ngram_max_length) const {
+  Ngrams ngrams;
+  for (const auto &word : words) {
+    for (size_t length = ngram_min_length;
          length <= ngram_max_length && length <= word.length(); length++) {
-      const NgramWord ngram_text = word.substr(0, length);
+      const std::string ngram_text = word.substr(0, length);
       if (!is_stop_word(ngram_text, stop_words)) {
         Ngram ngram;
         ngram.text = ngram_text;
@@ -76,15 +74,15 @@ NgramParser::generate_ngrams(const NgramWords &words,
   return ngrams;
 }
 
-NgramVec NgramParser::parse(const NgramText &text,
-                            const NgramStopWords &stop_words,
-                            NgramLength ngram_min_length,
-                            NgramLength ngram_max_length) const {
-  const NgramText clear = clear_text(text);
+Ngrams NgramParser::parse(const std::string &text,
+                          const NgramStopWords &stop_words,
+                          size_t ngram_min_length,
+                          size_t ngram_max_length) const {
+  const std::string clear = clear_text(text);
   const NgramWords words = remove_stop_words(split_in_words(clear), stop_words);
 
   // generate a vector of ngrams
-  NgramVec ngrams =
+  Ngrams ngrams =
       generate_ngrams(words, stop_words, ngram_min_length, ngram_max_length);
   return ngrams;
 }
