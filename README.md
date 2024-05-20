@@ -1,4 +1,4 @@
-# Full text search engine
+# Full-Text-Search Engine
 ![GitHub last commit](https://img.shields.io/github/last-commit/allenvox/full-text-search)<br>
 ### Build
 `cmake --preset release & cmake --build --preset release`<br>
